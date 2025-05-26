@@ -1,0 +1,13 @@
+- name: Setup CKS Cluster
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install master node setup
+      when: inventory_hostname == "cks-master"
+      shell: |
+        bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_master.sh)
+
+    - name: Install worker node setup
+      when: inventory_hostname == "cks-worker"
+      shell: |
+        bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_worker.sh)
