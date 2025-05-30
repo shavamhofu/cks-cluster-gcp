@@ -22,13 +22,13 @@ jobs:
         terraform init
         terraform apply -auto-approve
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: ${{secrets.GCP_CREDENTIALS}}
 
-    - name: Install Ansible
-      run: sudo apt-get install -y ansible
+    # - name: Install Ansible
+    #   run: sudo apt-get install -y ansible
 
-    - name: Run Ansible Playbooks
-      run: |
-        cd ansible
-        ansible-playbook -i inventory.ini master.yml
-        ansible-playbook -i inventory.ini worker.yml
+    # - name: Run Ansible Playbooks
+    #   run: |
+    #     cd ansible
+    #     ansible-playbook -i inventory.ini master.yml
+    #     ansible-playbook -i inventory.ini worker.yml
