@@ -63,6 +63,7 @@ resource "google_compute_firewall" "nodeports" {
     ports    = ["30000-40000"]
   }
 
+  source_ranges = ["0.0.0.0/0"]
   target_tags = ["cks-node"]
 }
 
