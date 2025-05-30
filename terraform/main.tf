@@ -4,14 +4,14 @@ provider "google" {
   zone    = var.zone
 }
 
-resource "google_compute_instance" "cks_master" {
+resource "google_compute_instance" "cks-master" {
   name         = "cks-master"
   machine_type = "e2-medium"
   zone         = var.zone
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2004-lts"
+      image = "ubuntu-2004-focal-v20220419"
       size  = 50
     }
   }
@@ -21,17 +21,21 @@ resource "google_compute_instance" "cks_master" {
     access_config {}
   }
 
-  tags = ["cks", "master"]
+  metadata = {
+    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+  }
+
+  tags = ["cks-node"]
 }
 
-resource "google_compute_instance" "cks_worker" {
+resource "google_compute_instance" "cks-worker" {
   name         = "cks-worker"
   machine_type = "e2-medium"
   zone         = var.zone
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2004-lts"
+      image = "ubuntu-2004-focal-v20220419"
       size  = 50
     }
   }
@@ -41,7 +45,11 @@ resource "google_compute_instance" "cks_worker" {
     access_config {}
   }
 
-  tags = ["cks", "worker"]
+  metadata = {
+    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+  }
+
+  tags = ["cks-node"]
 }
 
 resource "google_compute_firewall" "nodeports" {
@@ -53,6 +61,6 @@ resource "google_compute_firewall" "nodeports" {
     ports    = ["30000-40000"]
   }
 
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["cks"]
+  target_tags = ["cks-node"]
 }
+

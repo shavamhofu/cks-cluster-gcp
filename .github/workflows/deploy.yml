@@ -1,0 +1,34 @@
+name: Deploy CKS Cluster
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Init & Apply
+      run: |
+        cd terraform
+        terraform init
+        terraform apply -auto-approve
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+
+    - name: Install Ansible
+      run: sudo apt-get install -y ansible
+
+    - name: Run Ansible Playbooks
+      run: |
+        cd ansible
+        ansible-playbook -i inventory.ini master.yml
+        ansible-playbook -i inventory.ini worker.yml

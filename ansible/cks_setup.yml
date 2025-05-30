@@ -1,13 +1,37 @@
-- name: Setup CKS Cluster
-  hosts: all
-  become: yes
-  tasks:
-    - name: Install master node setup
-      when: inventory_hostname == "cks-master"
-      shell: |
-        bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_master.sh)
+# - name: Setup CKS Cluster
+#   hosts: all
+#   become: yes
+#   tasks:
+#     - name: Install master node setup
+#       when: inventory_hostname == "cks-master"
+#       shell: |
+#         bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_master.sh)
 
-    - name: Install worker node setup
-      when: inventory_hostname == "cks-worker"
-      shell: |
-        bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_worker.sh)
+#     - name: Install worker node setup
+#       when: inventory_hostname == "cks-worker"
+#       shell: |
+#         bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_worker.sh)
+
+# - name: Configure Kubernetes cluster
+#   hosts: all
+#   become: yes
+#   tasks:
+#     - name: Install dependencies
+#       apt:
+#         update_cache: yes
+#         name: curl
+#         state: present
+
+# - name: Setup master
+#   hosts: master
+#   become: yes
+#   tasks:
+#     - name: Run master setup script
+#       shell: bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_master.sh)
+
+# - name: Setup worker
+#   hosts: worker
+#   become: yes
+#   tasks:
+#     - name: Run worker setup script
+#       shell: bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_worker.sh)
