@@ -16,6 +16,6 @@ This repo provisions a CKS-ready Kubernetes cluster on Google Cloud using Terraf
 2. Set your GCP project ID in `terraform/terraform.tfvars`
 3. Replace SSH key path in `deploy.sh`
 4. Run:
-
+todo to put rewrite the file again
 ```bash
 ./deploy.sh
