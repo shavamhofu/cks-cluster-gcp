@@ -66,6 +66,11 @@ resource "google_compute_firewall" "nodeports" {
   target_tags = ["cks-node"]
 }
 
+resource "tls_private_key" "vm_ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
 # outputs.tf
 output "public_key_openssh" {
   value = tls_private_key.vm_ssh.public_key_openssh
