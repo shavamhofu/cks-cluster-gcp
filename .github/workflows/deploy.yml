@@ -29,14 +29,16 @@ jobs:
       env:
         VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}  
 
-    - name: Terraform Init & Apply
-      run: |
-        cd terraform
-        terraform init
-        TF_LOG=DEBUG terraform apply -auto-approve
+    # - name: Terraform Init & Apply
+    #   run: |
+    #     cd terraform
+    #     terraform init
+    #     TF_LOG=DEBUG terraform apply -auto-approve
 
-    # - name: Terraform Destroy
-    #   run: terraform destroy -auto-approve
+    - name: Terraform Destroy
+      run: |
+        terraform init
+        terraform destroy -auto-approve
 
       env:
         GOOGLE_CREDENTIALS: ${{secrets.GCP_CREDENTIALS}}
