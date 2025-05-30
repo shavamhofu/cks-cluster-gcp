@@ -34,6 +34,9 @@ jobs:
     #     cd terraform
     #     terraform init
     #     TF_LOG=DEBUG terraform apply -auto-approve
+    
+    - name: List Terraform files
+      run: ls -l
 
     - name: Terraform Destroy
       run: |
