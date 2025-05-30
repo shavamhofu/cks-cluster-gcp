@@ -1,4 +1,7 @@
-variable "project_id" {}
+variable "project_id" {
+  default = "nice-limiter-460717-s4"
+}
+
 variable "region" {
   default = "europe-west3"
 }
