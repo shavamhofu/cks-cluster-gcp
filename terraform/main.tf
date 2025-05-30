@@ -22,7 +22,8 @@ resource "google_compute_instance" "cks-master" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    # ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${tls_private_key.vm_ssh.public_key_openssh}"
   }
 
   tags = ["cks-node"]
@@ -46,7 +47,8 @@ resource "google_compute_instance" "cks-worker" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    # ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${tls_private_key.vm_ssh.public_key_openssh}"
   }
 
   tags = ["cks-node"]
@@ -63,4 +65,15 @@ resource "google_compute_firewall" "nodeports" {
 
   target_tags = ["cks-node"]
 }
+
+# outputs.tf
+output "public_key_openssh" {
+  value = tls_private_key.vm_ssh.public_key_openssh
+}
+
+output "private_key_pem" {
+  value     = tls_private_key.vm_ssh.private_key_pem
+  sensitive = true
+}
+
 

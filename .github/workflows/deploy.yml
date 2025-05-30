@@ -16,6 +16,19 @@ jobs:
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v3
 
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+      env:
+        VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}  
+
     - name: Terraform Init & Apply
       run: |
         cd terraform
@@ -24,11 +37,11 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{secrets.GCP_CREDENTIALS}}
 
-    # - name: Install Ansible
-    #   run: sudo apt-get install -y ansible
+    - name: Install Ansible
+      run: sudo apt-get install -y ansible
 
-    # - name: Run Ansible Playbooks
-    #   run: |
-    #     cd ansible
-    #     ansible-playbook -i inventory.ini master.yml
-    #     ansible-playbook -i inventory.ini worker.yml
+    - name: Run Ansible Playbooks
+      run: |
+        cd ansible
+        ansible-playbook -i inventory.ini master.yml
+        ansible-playbook -i inventory.ini worker.yml
