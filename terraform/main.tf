@@ -75,7 +75,7 @@ resource "google_compute_firewall" "nodeports" {
 
   allow {
     protocol = "tcp"
-    ports    = ["30000-40000"]
+    ports    = ["30000-40000","22"]
   }
 
   source_ranges = ["0.0.0.0/0"]
