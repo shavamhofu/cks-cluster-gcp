@@ -42,13 +42,19 @@ jobs:
       env:
         VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}  
 
-    - name: Terraform Init & Apply
-      if: env.TF_ACTION == 'apply'
+    - name: Terraform Init & Plan      
       run: |
         cd terraform
         terraform init
         # TF_LOG=DEBUG terraform apply -auto-approve
         terraform plan -out=tfplan
+       
+
+    - name: Terraform Init & Apply
+      if: env.TF_ACTION == 'apply'
+      run: |
+        cd terraform       
+        # TF_LOG=DEBUG terraform apply -auto-approve       
         terraform apply -auto-approve tfplan
 
     # - name: List Terraform files
