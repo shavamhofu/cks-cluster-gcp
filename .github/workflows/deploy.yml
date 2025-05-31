@@ -24,7 +24,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v3
@@ -48,7 +48,8 @@ jobs:
         cd terraform
         terraform init
         # TF_LOG=DEBUG terraform apply -auto-approve
-        terraform apply -auto-approve
+        terraform plan -out=tfplan
+        terraform apply -auto-approve tfplan
 
     # - name: List Terraform files
     #   run: ls -l
