@@ -1,13 +1,26 @@
-name: Deploy CKS Cluster
+name: Deploy GCP CKS Cluster
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform action to perform (apply/destroy)'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy    
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
+    env:
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
 
     steps:
     - name: Checkout code
@@ -30,6 +43,7 @@ jobs:
         VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}  
 
     - name: Terraform Init & Apply
+      if: env.TF_ACTION == 'apply'
       run: |
         cd terraform
         terraform init
@@ -39,10 +53,11 @@ jobs:
     # - name: List Terraform files
     #   run: ls -l
 
-    # - name: Terraform Destroy
-    #   run: |
-    #     terraform init
-    #     terraform destroy -auto-approve
+    - name: Terraform Destroy
+      if: env.TF_ACTION == 'destroy'
+      run: |
+        terraform init
+        terraform destroy -auto-approve
 
       env:
         GOOGLE_CREDENTIALS: ${{secrets.GCP_CREDENTIALS}}
