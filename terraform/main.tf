@@ -73,6 +73,8 @@ resource "google_compute_firewall" "nodeports" {
   name    = "nodeports"
   network = "default"
 
+#   added port 22 to allow ssh from my local machine
+
   allow {
     protocol = "tcp"
     ports    = ["30000-40000","22"]
