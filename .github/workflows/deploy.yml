@@ -63,6 +63,7 @@ jobs:
     - name: Terraform Destroy
       if: env.TF_ACTION == 'destroy'
       run: |
+        cd terraform 
         terraform init
         terraform destroy -auto-approve
 
