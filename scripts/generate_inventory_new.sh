@@ -19,3 +19,4 @@ $WORKER_IP ansible_user=ubuntu ansible_host=$WORKER_IP
 EOF
 
 echo "✅ Inventory generated at ansible/inventory.ini"
+cat ansible/inventory.ini

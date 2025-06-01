@@ -14,7 +14,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -45,11 +45,9 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
-          export_default_credentials: true
-       
+          export_default_credentials: true      
       
-        env:
-            VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}    
+           
 
       - name: 🧰 Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -88,7 +86,8 @@ jobs:
             # for ip in $NODES_IPS; do
             #   ssh-keyscan -H $ip >> ~/.ssh/known_hosts
             # done
-                  
+        env:
+          VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}             
 
       - name: 🧾 Generate Ansible Inventory
         if: env.TF_ACTION == 'apply'
