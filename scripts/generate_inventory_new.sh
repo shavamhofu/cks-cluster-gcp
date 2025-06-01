@@ -15,7 +15,7 @@ cat > ansible/inventory.ini <<EOF
 $MASTER_IP ansible_user=ubuntu ansible_host=$MASTER_IP
 
 [workers]
-$WORKER_IP ansible_user=ubuntu ansible_host=$WORKER_IP"
+$WORKER_IP ansible_user=ubuntu ansible_host=$WORKER_IP
 EOF
 
 echo "✅ Inventory generated at ansible/inventory.ini"
