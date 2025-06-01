@@ -14,7 +14,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -82,14 +82,22 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y ansible openssh-client inetutils-ping netcat-openbsd jq
 
-      - name: Setup SSH key
+    #   - name: Setup SSH key
+    #     if: env.TF_ACTION == 'apply'
+    #     run: |
+    #         mkdir -p ~/.ssh
+    #         echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    #         chmod 600 ~/.ssh/id_rsa
+    #     env:
+    #       VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}      
+      - name: 🔑 Extract and Save Terraform SSH Private Key
         if: env.TF_ACTION == 'apply'
         run: |
+            PRIVATE_KEY=$(terraform output -raw private_key_pem)
             mkdir -p ~/.ssh
-            echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-        env:
-          VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}             
+        working-directory: terraform      
 
       - name: 🧾 Generate Ansible Inventory
         if: env.TF_ACTION == 'apply'
@@ -104,8 +112,8 @@ jobs:
           mkdir -p ~/.ssh
           touch ~/.ssh/known_hosts
           
-          echo "⏳ Waiting 10s for instances to become SSH-ready..."
-          sleep 90
+          echo "⏳ Waiting 90s for instances to become SSH-ready..."
+          sleep 60
 
           for host in $HOSTS; do
             echo "🔐 Scanning SSH key for $host..."
