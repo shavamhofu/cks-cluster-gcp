@@ -61,12 +61,12 @@ jobs:
           terraform_version: 1.6.6
 
       - name: 📦 Terraform Init
-        if: env.TF_ACTION == 'destroy'
+        if: env.TF_ACTION == 'apply'
         run: terraform init
         working-directory: terraform
 
       - name: 📡 Terraform Apply
-        if: env.TF_ACTION == 'destroy'
+        if: env.TF_ACTION == 'apply'
         run: terraform apply -auto-approve
         working-directory: terraform
 
@@ -77,13 +77,13 @@ jobs:
             terraform destroy -auto-approve
 
       - name: 🧾 Generate Ansible Inventory
-        if: env.TF_ACTION == 'destroy'
+        if: env.TF_ACTION == 'apply'
         run: |
           chmod +x scripts/generate_inventory_new.sh
           ./scripts/generate_inventory_new.sh
 
       - name: 🔐 SSH Keyscan and Add to Known Hosts
-        if: env.TF_ACTION == 'destroy'
+        if: env.TF_ACTION == 'apply'
         run: |
           HOSTS=$(grep -v '^#' ansible/inventory.ini | grep 'ansible_host=' | sed -E 's/.*ansible_host=([0-9.]+).*/\1/' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$')
           mkdir -p ~/.ssh
@@ -94,7 +94,7 @@ jobs:
           done
 
       - name: 🛠️ Run Ansible Playbook
-        if: env.TF_ACTION == 'destroy'
+        if: env.TF_ACTION == 'apply'
         run: |
           cd ansible
           ansible-playbook -i inventory.ini master.yml
