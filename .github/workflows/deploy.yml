@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action to perform (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
 
     steps:
     - name: Checkout code
@@ -92,6 +92,11 @@ jobs:
           ssh-keyscan -H "$host" >> ~/.ssh/known_hosts || echo "ssh-keyscan failed for $host"
         done  
 
+    - name: Test SSH connectivity
+      run: |
+        apt-get update && apt-get install -y inetutils-ping
+        ping -c 3 34.40.70.1
+        nc -zv 34.40.70.1 22 || echo "Port 22 unreachable"
     # - name: Test SSH to master
     #   if: env.TF_ACTION == 'apply'
     #   run: ssh -o StrictHostKeyChecking=no ubuntu@$(awk '/master/ {print $1}' ansible/inventory.ini) hostname
