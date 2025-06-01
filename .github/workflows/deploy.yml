@@ -145,7 +145,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'destroy'
+        default: 'apply'
         type: choice
         options:
           - apply
@@ -155,7 +155,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -193,10 +193,25 @@ jobs:
       run: |
         cd terraform
         terraform destroy -auto-approve
-
+    
     - name: Generate Ansible Inventory
       if: env.TF_ACTION == 'apply'
-      run: bash scripts/generate_inventory.sh
+      run: ./scripts/generate_inventory.sh 
+      
+    - name: Scan SSH Host Keys
+      if: env.TF_ACTION == 'apply'
+      run: |
+        HOSTS=$(grep 'ansible_host=' ansible/inventory.ini | sed -E 's/.*ansible_host=([0-9.]+).*/\1/')
+        echo "$HOSTS" | xargs -I {} ssh-keyscan -H {} >> ~/.ssh/known_hosts  
+
+    # - name: Run Ansible Playbook (Master)      
+    #   working-directory: ansible
+    #   if: env.TF_ACTION == 'apply'
+    #   run: ansible-playbook -i inventory.ini master.yml    
+
+    # - name: Generate Ansible Inventory
+    #   if: env.TF_ACTION == 'apply'
+    #   run: bash scripts/generate_inventory.sh
 
     - name: Install Ansible & Utils
       if: env.TF_ACTION == 'apply'
@@ -212,26 +227,26 @@ jobs:
     #       echo "Scanning $host"
     #       ssh-keyscan -H "$host" >> ~/.ssh/known_hosts || echo "ssh-keyscan failed for $host"
     #     done
-    - name: Scan SSH Keys and Add to Known Hosts
-      if: env.TF_ACTION == 'apply'
-      run: |
-        # HOSTS=$(grep 'ansible_host=' ansible/inventory.ini | sed -E 's/.*ansible_host=([0-9.]+).*/\1/')
-        HOSTS=$(awk '{ for (i=1; i<=NF; i++) if ($i ~ /^ansible_host=/) { split($i, a, "="); print a[2] } }' ansible/inventory.ini)
-        if [ -z "$HOSTS" ]; then
-          echo "No hosts found in inventory.ini"
-          exit 1
-        fi
+    # - name: Scan SSH Keys and Add to Known Hosts
+    #   if: env.TF_ACTION == 'apply'
+    #   run: |
+    #     # HOSTS=$(grep 'ansible_host=' ansible/inventory.ini | sed -E 's/.*ansible_host=([0-9.]+).*/\1/')
+    #     HOSTS=$(awk '{ for (i=1; i<=NF; i++) if ($i ~ /^ansible_host=/) { split($i, a, "="); print a[2] } }' ansible/inventory.ini)
+    #     if [ -z "$HOSTS" ]; then
+    #       echo "No hosts found in inventory.ini"
+    #       exit 1
+    #     fi
 
-        for host in $HOSTS; do
-          echo "Scanning $host"
-          ssh-keyscan -H "$host" >> ~/.ssh/known_hosts || echo "ssh-keyscan failed for $host"
-        done
+    #     for host in $HOSTS; do
+    #       echo "Scanning $host"
+    #       ssh-keyscan -H "$host" >> ~/.ssh/known_hosts || echo "ssh-keyscan failed for $host"
+    #     done
 
-    - name: Run Ansible Playbooks
-      if: env.TF_ACTION == 'apply'
-      run: |
-        cd ansible
-        export ANSIBLE_HOST_KEY_CHECKING=False
-        ansible-playbook -i inventory.ini master.yml -vvvv
-        ansible-playbook -i inventory.ini worker.yml -vvvv
+    # - name: Run Ansible Playbooks
+    #   if: env.TF_ACTION == 'apply'
+    #   run: |
+    #     cd ansible
+    #     export ANSIBLE_HOST_KEY_CHECKING=False
+    #     ansible-playbook -i inventory.ini master.yml -vvvv
+    #     ansible-playbook -i inventory.ini worker.yml -vvvv
 

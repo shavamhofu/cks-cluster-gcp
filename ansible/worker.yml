@@ -1,5 +1,5 @@
 - name: Setup CKS Worker Node
-  hosts: worker
+  hosts: workers
   become: yes
   tasks:
     - name: Install worker setup script

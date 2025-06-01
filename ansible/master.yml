@@ -1,5 +1,5 @@
 - name: Setup CKS Master Node
-  hosts: master
+  hosts: masters
   become: yes
   tasks:
     - name: Install master setup script      
