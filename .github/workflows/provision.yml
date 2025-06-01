@@ -14,7 +14,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'destroy'
+        default: 'apply'
         type: choice
         options:
           - apply
@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -79,7 +79,7 @@ jobs:
       - name: 🧾 Generate Ansible Inventory
         if: env.TF_ACTION == 'destroy'
         run: |
-          chmod +x scripts/generate_inventory.sh
+          chmod +x scripts/generate_inventory_new.sh
           ./scripts/generate_inventory_new.sh
 
       - name: 🔐 SSH Keyscan and Add to Known Hosts
