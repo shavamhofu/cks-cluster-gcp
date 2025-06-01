@@ -22,10 +22,10 @@ WORKER_IP1=$(jq -r '.instance_ips.value[1]' terraform/tfout.json)
 WORKER_IP2=$(jq -r '.instance_ips.value[2]' terraform/tfout.json)
 
 cat <<EOF > ansible/inventory.ini
-[masters]
+[master]
 $MASTER_IP ansible_user=ubuntu ansible_host=$MASTER_IP
 
-[workers]
+[worker]
 $WORKER_IP1 ansible_user=ubuntu ansible_host=$WORKER_IP1
 $WORKER_IP2 ansible_user=ubuntu ansible_host=$WORKER_IP2
 EOF
