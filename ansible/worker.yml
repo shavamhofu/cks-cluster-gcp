@@ -3,6 +3,11 @@
   become: yes
   tasks:
     - name: Install worker setup script
-      shell: |
-        bash <(curl -s k8/install_worker.sh)
-        # bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_worker.sh)
+      ansible.builtin.shell: |
+        bash -c "bash <(curl -s k8/install_worker.sh)"
+      args:
+        executable: /bin/bash 
+    # - name: Install worker setup script
+    #   shell: |
+    #     bash <(curl -s k8/install_worker.sh)
+    #     # bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_worker.sh)
