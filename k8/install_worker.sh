@@ -16,7 +16,7 @@ if [ "$DISTRIB_RELEASE" != "20.04" ]; then
     read
 fi
 
-KUBE_VERSION=1.31.7
+KUBE_VERSION=1.32.3
 
 # get platform
 PLATFORM=`uname -p`
@@ -74,7 +74,7 @@ EOF
 
 
 ### install packages
-sudo apt-get install -y apt-transport-https ca-certificates
+apt-get install -y apt-transport-https ca-certificates
 mkdir -p /etc/apt/keyrings
 rm /etc/apt/keyrings/kubernetes-1-31-apt-keyring.gpg || true
 rm /etc/apt/keyrings/kubernetes-1-32-apt-keyring.gpg || true
@@ -83,9 +83,9 @@ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --
 echo > /etc/apt/sources.list.d/kubernetes.list
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-1-31-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-1-32-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-sudo apt-get --allow-unauthenticated update
-sudo apt-get --allow-unauthenticated install -y docker.io containerd kubelet=${KUBE_VERSION}-1.1 kubeadm=${KUBE_VERSION}-1.1 kubectl=${KUBE_VERSION}-1.1 kubernetes-cni
-sudo apt-mark hold kubelet kubeadm kubectl kubernetes-cni
+apt-get --allow-unauthenticated update
+apt-get --allow-unauthenticated install -y docker.io containerd kubelet=${KUBE_VERSION}-1.1 kubeadm=${KUBE_VERSION}-1.1 kubectl=${KUBE_VERSION}-1.1 kubernetes-cni
+apt-mark hold kubelet kubeadm kubectl kubernetes-cni
 
 
 ### install containerd 1.6 over apt-installed-version
@@ -148,9 +148,8 @@ version = 2
         NoPivotRoot = false
         Root = ""
         ShimCgroup = ""
-        SystemdCgroup = false
+        SystemdCgroup = true
 EOF
-
 
 ### crictl uses containerd as default
 {
@@ -159,7 +158,6 @@ runtime-endpoint: unix:///run/containerd/containerd.sock
 EOF
 }
 
-
 ### kubelet should use containerd
 {
 cat <<EOF | sudo tee /etc/default/kubelet
@@ -167,21 +165,16 @@ KUBELET_EXTRA_ARGS="--container-runtime-endpoint unix:///run/containerd/containe
 EOF
 }
 
-
-
 ### start services
 systemctl daemon-reload
 systemctl enable containerd
 systemctl restart containerd
 systemctl enable kubelet && systemctl start kubelet
 
-
-
 ### init k8s
 kubeadm reset -f
 systemctl daemon-reload
 service kubelet start
-
 
 echo
 echo "EXECUTE ON MASTER: kubeadm token create --print-join-command --ttl 0"

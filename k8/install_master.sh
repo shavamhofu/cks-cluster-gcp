@@ -16,7 +16,7 @@ if [ "$DISTRIB_RELEASE" != "20.04" ]; then
     read
 fi
 
-KUBE_VERSION=1.31.7
+KUBE_VERSION=1.32.3
 
 # get platform
 PLATFORM=`uname -p`
@@ -49,6 +49,7 @@ sed -i '1s/^/force_color_prompt=yes\n/' ~/.bashrc
 swapoff -a
 sed -i '/\sswap\s/ s/^\(.*\)$/#\1/g' /etc/fstab
 
+
 ### remove packages
 kubeadm reset -f || true
 crictl rm --force $(crictl ps -a -q) || true
@@ -56,6 +57,8 @@ apt-mark unhold kubelet kubeadm kubectl kubernetes-cni || true
 apt-get remove -y docker.io containerd kubelet kubeadm kubectl kubernetes-cni || true
 apt-get autoremove -y
 systemctl daemon-reload
+
+
 
 ### install podman
 . /etc/os-release
@@ -69,6 +72,7 @@ cat <<EOF | sudo tee /etc/containers/registries.conf
 registries = ['docker.io']
 EOF
 
+
 ### install packages
 apt-get install -y apt-transport-https ca-certificates
 mkdir -p /etc/apt/keyrings
@@ -79,9 +83,10 @@ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --
 echo > /etc/apt/sources.list.d/kubernetes.list
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-1-31-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-1-32-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-sudo apt-get --allow-unauthenticated update
-sudo apt-get --allow-unauthenticated install -y docker.io containerd kubelet=${KUBE_VERSION}-1.1 kubeadm=${KUBE_VERSION}-1.1 kubectl=${KUBE_VERSION}-1.1 kubernetes-cni
-sudo apt-mark hold kubelet kubeadm kubectl kubernetes-cni
+apt-get --allow-unauthenticated update
+apt-get --allow-unauthenticated install -y docker.io containerd kubelet=${KUBE_VERSION}-1.1 kubeadm=${KUBE_VERSION}-1.1 kubectl=${KUBE_VERSION}-1.1 kubernetes-cni
+apt-mark hold kubelet kubeadm kubectl kubernetes-cni
+
 
 ### install containerd 1.6 over apt-installed-version
 wget https://github.com/containerd/containerd/releases/download/v1.6.12/containerd-1.6.12-linux-${PLATFORM}.tar.gz
@@ -91,6 +96,7 @@ mv bin/* /usr/bin
 rm -rf bin containerd-1.6.12-linux-${PLATFORM}.tar.gz
 systemctl unmask containerd
 systemctl start containerd
+
 
 ### containerd
 cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
@@ -106,6 +112,7 @@ net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 sudo sysctl --system
 sudo mkdir -p /etc/containerd
+
 
 ### containerd config
 cat > /etc/containerd/config.toml <<EOF
@@ -141,8 +148,9 @@ version = 2
         NoPivotRoot = false
         Root = ""
         ShimCgroup = ""
-        SystemdCgroup = false
+        SystemdCgroup = true
 EOF
+
 
 ### crictl uses containerd as default
 {
@@ -150,6 +158,7 @@ cat <<EOF | sudo tee /etc/crictl.yaml
 runtime-endpoint: unix:///run/containerd/containerd.sock
 EOF
 }
+
 
 ### kubelet should use containerd
 {
@@ -159,11 +168,13 @@ EOF
 }
 
 
+
 ### start services
 systemctl daemon-reload
 systemctl enable containerd
 systemctl restart containerd
 systemctl enable kubelet && systemctl start kubelet
+
 
 ### init k8s
 rm /root/.kube/config || true
@@ -174,8 +185,8 @@ sudo cp -i /etc/kubernetes/admin.conf ~/.kube/config
 
 ### CNI
 # kubectl apply -f https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/calico.yaml
-cd k8
-kubectl apply -f calico.yaml
+kubectl apply -f k8/calico.yaml
+
 
 # etcdctl
 ETCDCTL_VERSION=v3.5.1
