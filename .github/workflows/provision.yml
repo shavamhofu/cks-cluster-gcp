@@ -1,0 +1,100 @@
+# name: ⚙️ Provision CKS GCP Cluster
+
+# on:
+#   workflow_dispatch:
+#   schedule:
+#     - cron: "0 6 * * 1-5"  # Weekdays 6AM UTC (adjust as needed)
+name: ⚙️ Provision CKS GCP Cluster
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform action (apply/destroy)'
+        required: true
+        default: 'destroy'
+        type: choice
+        options:
+          - apply
+          - destroy    
+
+jobs:
+  deploy:
+    name: 🚀 Provision and Configure Cluster
+    runs-on: ubuntu-latest
+
+    env:
+    #   TF_ACTION: apply
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      GCP_PROJECT: nice-limiter-460717-s4
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+    #   - name: ☁️ Set up Google Cloud SDK
+    #     uses: google-github-actions/setup-gcloud@v2
+    #     with:
+    #       project_id: ${{ env.GCP_PROJECT }}
+    #       service_account_key: ${{ secrets.GCP_SA_KEY }}
+    #       export_default_credentials: true
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+          export_default_credentials: true
+       
+      - name: Setup SSH key
+        run: |
+            mkdir -p ~/.ssh
+            echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+        env:
+            VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}    
+
+      - name: 🧰 Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: 📦 Terraform Init
+        if: env.TF_ACTION == 'destroy'
+        run: terraform init
+        working-directory: terraform
+
+      - name: 📡 Terraform Apply
+        if: env.TF_ACTION == 'destroy'
+        run: terraform apply -auto-approve
+        working-directory: terraform
+
+      - name: Terraform Destroy
+        if: env.TF_ACTION == 'destroy'
+        run: |
+            cd terraform
+            terraform destroy -auto-approve
+
+      - name: 🧾 Generate Ansible Inventory
+        if: env.TF_ACTION == 'destroy'
+        run: |
+          chmod +x scripts/generate_inventory.sh
+          ./scripts/generate_inventory_new.sh
+
+      - name: 🔐 SSH Keyscan and Add to Known Hosts
+        if: env.TF_ACTION == 'destroy'
+        run: |
+          HOSTS=$(grep -v '^#' ansible/inventory.ini | grep 'ansible_host=' | sed -E 's/.*ansible_host=([0-9.]+).*/\1/' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$')
+          mkdir -p ~/.ssh
+          touch ~/.ssh/known_hosts
+          for host in $HOSTS; do
+            echo "🔐 Scanning SSH key for $host..."
+            ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null
+          done
+
+      - name: 🛠️ Run Ansible Playbook
+        if: env.TF_ACTION == 'destroy'
+        run: |
+          cd ansible
+          ansible-playbook -i inventory.ini master.yml
