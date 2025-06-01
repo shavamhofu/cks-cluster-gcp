@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action to perform (apply/destroy)'
         required: true
-        default: 'destroy'
+        default: 'apply'
         type: choice
         options:
           - apply
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
 
     steps:
     - name: Checkout code
