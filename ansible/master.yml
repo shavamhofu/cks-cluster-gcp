@@ -2,6 +2,7 @@
   hosts: master
   become: yes
   tasks:
-    - name: Install master setup script
+    - name: Install master setup script      
       shell: |
-        bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_master.sh)
+        bash <(curl -s k8/install_master.sh)
+        # bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_master.sh)

@@ -4,4 +4,5 @@
   tasks:
     - name: Install worker setup script
       shell: |
-        bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_worker.sh)
+        bash <(curl -s k8/install_worker.sh)
+        # bash <(curl -s https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/latest/install_worker.sh)
