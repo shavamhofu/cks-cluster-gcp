@@ -14,7 +14,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'destroy'
+        default: 'apply'
         type: choice
         options:
           - apply
@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -52,6 +52,7 @@ jobs:
             mkdir -p ~/.ssh
             echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
+            
         env:
             VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}    
 
@@ -88,10 +89,22 @@ jobs:
           HOSTS=$(grep -v '^#' ansible/inventory.ini | grep 'ansible_host=' | sed -E 's/.*ansible_host=([0-9.]+).*/\1/' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$')
           mkdir -p ~/.ssh
           touch ~/.ssh/known_hosts
+          
+          echo "⏳ Waiting 10s for instances to become SSH-ready..."
+          sleep 90
+
           for host in $HOSTS; do
             echo "🔐 Scanning SSH key for $host..."
-            ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null
+            if ! ssh-keyscan -T 10 -H "$host" >> ~/.ssh/known_hosts; then
+                echo "❌ Failed to scan SSH key for $host"
+                exit 1
+            fi
           done
+
+        #   for host in $HOSTS; do
+        #     echo "🔐 Scanning SSH key for $host..."
+        #     ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null
+        #   done
 
       - name: 🛠️ Run Ansible Playbook
         if: env.TF_ACTION == 'apply'
