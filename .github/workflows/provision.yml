@@ -14,7 +14,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -75,6 +75,12 @@ jobs:
     #     id: tf-output
     #     run: |
     #         echo "NODES_IPS=$(terraform output -json instance_ips | jq -r '.[]' | paste -sd " ")" >> $GITHUB_ENV      
+      
+      - name: Install Ansible & Utils
+        if: env.TF_ACTION == 'apply'
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y ansible openssh-client inetutils-ping netcat-openbsd jq
 
       - name: Setup SSH key
         if: env.TF_ACTION == 'apply'
@@ -82,10 +88,6 @@ jobs:
             mkdir -p ~/.ssh
             echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-
-            # for ip in $NODES_IPS; do
-            #   ssh-keyscan -H $ip >> ~/.ssh/known_hosts
-            # done
         env:
           VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}             
 
