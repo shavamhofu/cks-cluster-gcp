@@ -61,7 +61,7 @@ jobs:
           terraform_version: 1.6.6
 
       - name: 📦 Terraform Init
-        if: env.TF_ACTION == 'apply'
+        # if: env.TF_ACTION == 'apply'
         run: terraform init
         working-directory: terraform
 
