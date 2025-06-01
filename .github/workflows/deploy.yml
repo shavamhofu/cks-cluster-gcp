@@ -101,15 +101,15 @@ jobs:
     #   if: env.TF_ACTION == 'apply'
     #   run: ssh -o StrictHostKeyChecking=no ubuntu@$(awk '/master/ {print $1}' ansible/inventory.ini) hostname
 
-    - name: Install Ansible
-      if: env.TF_ACTION == 'apply'
-      run: sudo apt-get install -y ansible
+    # - name: Install Ansible
+    #   if: env.TF_ACTION == 'apply'
+    #   run: sudo apt-get install -y ansible
 
-    - name: Run Ansible Playbooks
-      if: env.TF_ACTION == 'apply'
-      run: |
-        cd ansible
-        export ANSIBLE_HOST_KEY_CHECKING=False
-        ansible-playbook -i inventory.ini master.yml -vvvv
-        export ANSIBLE_HOST_KEY_CHECKING=False
-        ansible-playbook -i inventory.ini worker.yml -vvvv
+    # - name: Run Ansible Playbooks
+    #   if: env.TF_ACTION == 'apply'
+    #   run: |
+    #     cd ansible
+    #     export ANSIBLE_HOST_KEY_CHECKING=False
+    #     ansible-playbook -i inventory.ini master.yml -vvvv
+    #     export ANSIBLE_HOST_KEY_CHECKING=False
+    #     ansible-playbook -i inventory.ini worker.yml -vvvv
