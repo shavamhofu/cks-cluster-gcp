@@ -14,7 +14,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -72,11 +72,11 @@ jobs:
             cd terraform
             terraform destroy -auto-approve
 
-      - name: Get Terraform Outputs
-        if: env.TF_ACTION == 'apply'
-        id: tf-output
-        run: |
-            echo "NODES_IPS=$(terraform output -json instance_ips | jq -r '.[]' | paste -sd " ")" >> $GITHUB_ENV      
+    #   - name: Get Terraform Outputs
+    #     if: env.TF_ACTION == 'apply'
+    #     id: tf-output
+    #     run: |
+    #         echo "NODES_IPS=$(terraform output -json instance_ips | jq -r '.[]' | paste -sd " ")" >> $GITHUB_ENV      
 
       - name: Setup SSH key
         if: env.TF_ACTION == 'apply'
@@ -85,9 +85,9 @@ jobs:
             echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
 
-            for ip in $NODES_IPS; do
-              ssh-keyscan -H $ip >> ~/.ssh/known_hosts
-            done
+            # for ip in $NODES_IPS; do
+            #   ssh-keyscan -H $ip >> ~/.ssh/known_hosts
+            # done
                   
 
       - name: 🧾 Generate Ansible Inventory
