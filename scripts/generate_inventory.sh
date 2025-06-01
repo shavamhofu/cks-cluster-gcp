@@ -49,7 +49,7 @@ fi
 
 MASTER_IP=$(echo "$IP_LIST" | sed -n 1p)
 WORKER_IP1=$(echo "$IP_LIST" | sed -n 2p)
-WORKER_IP2=$(echo "$IP_LIST" | sed -n 3p)
+# WORKER_IP2=$(echo "$IP_LIST" | sed -n 3p)
 
 cat <<EOF > ansible/inventory.ini
 [masters]
@@ -57,7 +57,7 @@ $MASTER_IP ansible_user=ubuntu ansible_host=$MASTER_IP
 
 [workers]
 $WORKER_IP1 ansible_user=ubuntu ansible_host=$WORKER_IP1
-$WORKER_IP2 ansible_user=ubuntu ansible_host=$WORKER_IP2
+# $WORKER_IP2 ansible_user=ubuntu ansible_host=$WORKER_IP2
 EOF
 
 echo "✅ Inventory generated at ansible/inventory.ini"
