@@ -147,8 +147,8 @@ version = 2
         NoNewKeyring = false
         NoPivotRoot = false
         Root = ""
-        ShimCgroup = ""
-        SystemdCgroup = true
+        Shim = ""
+        Systemd = true
 EOF
 
 ### crictl uses containerd as default

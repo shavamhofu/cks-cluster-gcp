@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action to perform (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
 
     steps:
     - name: Checkout code
@@ -69,6 +69,10 @@ jobs:
 
       env:
         GOOGLE_CREDENTIALS: ${{secrets.GCP_CREDENTIALS}}
+
+    # - name: Generate Ansible Inventory
+    #   if: env.TF_ACTION == 'apply'
+    #   run: bash scripts/generate_inventory.sh    
 
     - name: Install Ansible
       if: env.TF_ACTION == 'apply'
