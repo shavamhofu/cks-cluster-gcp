@@ -145,7 +145,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'destroy'
+        default: 'apply'
         type: choice
         options:
           - apply
@@ -155,7 +155,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -204,10 +204,23 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ansible openssh-client inetutils-ping netcat-openbsd jq
 
-    - name: Scan Host Keys
+    # - name: Scan Host Keys
+    #   if: env.TF_ACTION == 'apply'
+    #   run: |
+    #     HOSTS=$(awk '/ansible_host/ {print $2}' ansible/inventory.ini)
+    #     for host in $HOSTS; do
+    #       echo "Scanning $host"
+    #       ssh-keyscan -H "$host" >> ~/.ssh/known_hosts || echo "ssh-keyscan failed for $host"
+    #     done
+    - name: Scan SSH Keys and Add to Known Hosts
       if: env.TF_ACTION == 'apply'
       run: |
-        HOSTS=$(awk '/ansible_host/ {print $2}' ansible/inventory.ini)
+        HOSTS=$(grep 'ansible_host=' ansible/inventory.ini | sed -E 's/.*ansible_host=([0-9.]+).*/\1/')
+        if [ -z "$HOSTS" ]; then
+          echo "No hosts found in inventory.ini"
+          exit 1
+        fi
+
         for host in $HOSTS; do
           echo "Scanning $host"
           ssh-keyscan -H "$host" >> ~/.ssh/known_hosts || echo "ssh-keyscan failed for $host"
