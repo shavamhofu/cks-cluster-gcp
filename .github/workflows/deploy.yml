@@ -145,7 +145,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -155,7 +155,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -193,9 +193,15 @@ jobs:
       run: |
         cd terraform
         terraform destroy -auto-approve
-    
-    - name: Generate Ansible Inventory
+
+    # - name: Generate Ansible Inventory  
+    #   chmod +x scripts/generate_inventory.sh
+    - name: Make generate_inventory.sh executable
       if: env.TF_ACTION == 'apply'
+      run: chmod +x scripts/generate_inventory.sh    
+    
+    - name: Generate Ansible Inventory      
+      if: env.TF_ACTION == 'apply'      
       run: ./scripts/generate_inventory.sh 
       
     - name: Scan SSH Host Keys
