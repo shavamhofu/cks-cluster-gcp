@@ -145,7 +145,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -155,7 +155,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -204,14 +204,23 @@ jobs:
       if: env.TF_ACTION == 'apply'      
       run: ./scripts/generate_inventory.sh 
       
-    - name: Scan SSH Host Keys
-      if: env.TF_ACTION == 'apply'
+    # - name: Scan SSH Host Keys
+    #   if: env.TF_ACTION == 'apply'
+    #   run: |
+    #     # HOSTS=$(grep 'ansible_host=' ansible/inventory.ini | sed -E 's/.*ansible_host=([0-9.]+).*/\1/')
+    #     HOSTS=$(grep 'ansible_host=' ansible/inventory.ini | sed -E 's/.*ansible_host=([0-9.]+).*/\1/' | grep -E '^[0-9.]+$')
+    #     # echo "$HOSTS" | xargs -I {} ssh-keyscan -H {} >> ~/.ssh/known_hosts 
+    #     for host in $HOSTS; do
+    #       ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null
+        # done 
+    - name: 🛡️ Scan SSH host keys
+      if: env.TF_ACTION == 'apply' 
       run: |
-        HOSTS=$(grep 'ansible_host=' ansible/inventory.ini | sed -E 's/.*ansible_host=([0-9.]+).*/\1/')
-        # echo "$HOSTS" | xargs -I {} ssh-keyscan -H {} >> ~/.ssh/known_hosts 
+        HOSTS=$(grep -v '^#' ansible/inventory.ini | grep 'ansible_host=' | sed -E 's/.*ansible_host=([0-9.]+).*/\1/' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$')
         for host in $HOSTS; do
+          echo "🔐 Scanning SSH host key for $host..."
           ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null
-        done 
+        done   
 
     # - name: Run Ansible Playbook (Master)      
     #   working-directory: ansible
