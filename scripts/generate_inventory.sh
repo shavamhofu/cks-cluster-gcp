@@ -5,10 +5,10 @@ WORKER_IP=$(terraform -chdir=terraform output -raw worker_ip)
 
 cat <<EOF > ansible/inventory.ini
 [master]
-$MASTER_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+$MASTER_IP ansible_user=ubuntu
 
 [worker]
-$WORKER_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+$WORKER_IP ansible_user=ubuntu
 EOF
 
 echo "Inventory generated at ansible/inventory.ini"
