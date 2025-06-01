@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action to perform (apply/destroy)'
         required: true
-        default: 'destroy'
+        default: 'apply'
         type: choice
         options:
           - apply
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
 
     steps:
     - name: Checkout code
@@ -70,9 +70,18 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{secrets.GCP_CREDENTIALS}}
 
+    - name: Add SSH host to known_hosts
+      if: env.TF_ACTION == 'apply'
+      run: |
+        ssh-keyscan -H $(awk '/master/ {print $1}' ansible/inventory.ini) >> ~/.ssh/known_hosts    
+
     - name: Generate Ansible Inventory
       if: env.TF_ACTION == 'apply'
       run: bash scripts/generate_inventory.sh    
+
+    - name: Test SSH to master
+      if: env.TF_ACTION == 'apply'
+      run: ssh -o StrictHostKeyChecking=no ubuntu@$(awk '/master/ {print $1}' ansible/inventory.ini) hostname
 
     - name: Install Ansible
       if: env.TF_ACTION == 'apply'
