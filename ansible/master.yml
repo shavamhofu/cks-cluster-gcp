@@ -8,11 +8,27 @@
         dest: /tmp/install_master.sh
         mode: '0755'
 
+    - name: Copy master install script to remote
+      ansible.builtin.copy:
+        src: k8/calico.yaml
+        dest: /tmp/calico.yaml
+        mode: '0755'    
+
     - name: Run master install script
       ansible.builtin.shell: bash /tmp/install_master.sh
+      args:
+        chdir: "{{ playbook_dir }}/.."
       register: install_output
       ignore_errors: yes
 
+    - name: Get kubeadm join command
+      ansible.builtin.shell: kubeadm token create --print-join-command
+      register: join_command
+      become: yes  
+    
+    - name: Set fact with join command
+      ansible.builtin.set_fact:
+        kube_join_cmd: "{{ join_command.stdout }}"
     # - name: Install master setup script
     #   ansible.builtin.shell: |
     #     curl -s k8/install_master.sh | bash

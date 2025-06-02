@@ -2,9 +2,38 @@
   hosts: masters
   become: yes
   tasks:
-    - name: Install master setup script
-      ansible.builtin.shell: |
-        curl -s k8/install_worker.sh | bash
+    - name: Copy master install script to remote
+      ansible.builtin.copy:
+        src: k8/install_worker.sh
+        dest: /tmp/install_worker.sh
+        mode: '0755'
+
+    - name: Run master install script
+      ansible.builtin.shell: bash /tmp/install_worker.sh
+      register: install_output
+      ignore_errors: yes
+
+    - name: Join Kubernetes cluster
+      ansible.builtin.shell: "{{ kube_join_cmd }}"
+      args:
+        executable: /bin/bash
+      become: yes
+      when: kube_join_cmd is defined  
+
+    - name: Show install script output
+      debug:
+        var: install_output.stdout_lines
+
+    - name: Show install script error
+      debug:
+        var: install_output.stderr_lines  
+    - name: Print exit code
+      debug:
+        var: install_output.rc     
+
+    # - name: Install master setup script
+    #   ansible.builtin.shell: |
+    #     curl -s k8/install_worker.sh | bash
 # - name: Setup CKS Worker Node
 #   hosts: workers
 #   become: yes
