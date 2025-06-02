@@ -4,9 +4,17 @@
   tasks:
     - name: Install master setup script
       ansible.builtin.shell: |
-        bash -c "bash <(curl -s k8/install_master.sh)"
-      args:
-        executable: /bin/bash 
+        curl -s k8/install_master.sh | bash
+
+# - name: Setup CKS Master Node
+#   hosts: masters
+#   become: yes
+#   tasks:
+#     - name: Install master setup script
+#       ansible.builtin.shell: |        
+#         sudo bash -c "bash <(curl -s k8/install_master.sh)"
+#       args:
+#         executable: /bin/bash 
     # - name: Install master setup script      
     #   shell: |
     #     bash <(curl -s k8/install_master.sh)

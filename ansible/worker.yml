@@ -1,12 +1,19 @@
-- name: Setup CKS Worker Node
-  hosts: workers
+- name: Setup CKS Master Node
+  hosts: masters
   become: yes
   tasks:
-    - name: Install worker setup script
+    - name: Install master setup script
       ansible.builtin.shell: |
-        bash -c "bash <(curl -s k8/install_worker.sh)"
-      args:
-        executable: /bin/bash 
+        curl -s k8/install_worker.sh | bash
+# - name: Setup CKS Worker Node
+#   hosts: workers
+#   become: yes
+#   tasks:
+#     - name: Install worker setup script
+#       ansible.builtin.shell: |        
+#         sudo bash -c "bash <(curl -s k8/install_worker.sh)"
+#       args:
+#         executable: /bin/bash 
     # - name: Install worker setup script
     #   shell: |
     #     bash <(curl -s k8/install_worker.sh)
