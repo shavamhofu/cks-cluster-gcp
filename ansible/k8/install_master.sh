@@ -5,9 +5,7 @@
 # set -xe
 set -euo pipefail
 
-export DEBIAN_FRONTEND=noninteractive
-
-
+exec > >(tee -a /tmp/install_master.log) 2>&1
 
 source /etc/lsb-release
 if [ "$DISTRIB_RELEASE" != "20.04" ]; then
