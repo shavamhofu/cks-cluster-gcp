@@ -2,10 +2,7 @@
 
 # Source: http://kubernetes.io/docs/getting-started-guides/kubeadm
 
- set e
-# set -euo pipefail
-
-# exec > >(tee -a /tmp/install_master.log) 2>&1
+set -e
 
 source /etc/lsb-release
 if [ "$DISTRIB_RELEASE" != "20.04" ]; then
@@ -60,6 +57,7 @@ apt-mark unhold kubelet kubeadm kubectl kubernetes-cni || true
 apt-get remove -y docker.io containerd kubelet kubeadm kubectl kubernetes-cni || true
 apt-get autoremove -y
 systemctl daemon-reload
+
 
 
 ### install podman
@@ -170,6 +168,7 @@ EOF
 }
 
 
+
 ### start services
 systemctl daemon-reload
 systemctl enable containerd
@@ -184,10 +183,9 @@ kubeadm init --kubernetes-version=${KUBE_VERSION} --ignore-preflight-errors=NumC
 mkdir -p ~/.kube
 sudo cp -i /etc/kubernetes/admin.conf ~/.kube/config
 
-echo "### install calico.yaml #######################################################################"
 ### CNI
 kubectl apply -f https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/calico.yaml
-# kubectl apply -f k8/calico.yaml
+
 
 # etcdctl
 ETCDCTL_VERSION=v3.5.1
@@ -200,21 +198,4 @@ rm -rf ${ETCDCTL_VERSION_FULL} ${ETCDCTL_VERSION_FULL}.tar.gz
 
 echo
 echo "### COMMAND TO ADD A WORKER NODE ###"
-# set +e
-# echo
-echo "### COMMAND TO ADD A WORKER NODE ###"
-kubeadm token create --print-join-command --ttl 0 
-echo "CKS MASTER NODE SETUP COMPLETE"
-
-# set +e
-# echo
-# echo "### COMMAND TO ADD A WORKER NODE ###"
-# JOIN_COMMAND=$(kubeadm token create --print-join-command --ttl 0 2>&1)
-# if [ $? -ne 0 ]; then
-#   echo "WARN: kubeadm token create failed: $JOIN_COMMAND"
-# else
-#   echo "$JOIN_COMMAND"
-# fi
-
-# echo "CKS MASTER NODE SETUP COMPLETE"
-# exit 0
+kubeadm token create --print-join-command --ttl 0
