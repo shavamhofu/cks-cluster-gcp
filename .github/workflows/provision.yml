@@ -14,7 +14,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -128,9 +128,17 @@ jobs:
         #     ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null
         #   done
 
-      - name: 🛠️ Run Ansible Playbooks
+      - name: 🛠️ Run Ansible Playbooks Master
         if: env.TF_ACTION == 'apply'
         run: |
           cd ansible
           ansible-playbook -i inventory.ini master.yml -vvvv
+        #   ansible-playbook -i inventory.ini worker.yml -vvvv 
+
+      - name: 🛠️ Run Ansible Playbooks Worker
+        if: env.TF_ACTION == 'apply'
+        run: |
+          cd ansible          
           ansible-playbook -i inventory.ini worker.yml -vvvv 
+
+

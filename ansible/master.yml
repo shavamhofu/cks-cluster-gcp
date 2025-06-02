@@ -2,11 +2,22 @@
   hosts: masters
   become: yes
   tasks:
-    - name: Install master setup script
-      ansible.builtin.shell: |
-        curl -s k8/install_master.sh | bash
+    - name: Copy master install script to remote
+      ansible.builtin.copy:
+        src: k8/install_master.sh
+        dest: /tmp/install_master.sh
+        mode: '0755'
+
+    - name: Run master install script
+      ansible.builtin.shell: bash /tmp/install_master.sh
       register: install_output
       ignore_errors: yes
+
+    # - name: Install master setup script
+    #   ansible.builtin.shell: |
+    #     curl -s k8/install_master.sh | bash
+    #   register: install_output
+    #   ignore_errors: yes
       
     - name: Show install script output
       debug:
@@ -15,6 +26,9 @@
     - name: Show install script error
       debug:
         var: install_output.stderr_lines  
+    - name: Print exit code
+      debug:
+        var: install_output.rc    
 # - name: Setup CKS Master Node
 #   hosts: masters
 #   become: yes
