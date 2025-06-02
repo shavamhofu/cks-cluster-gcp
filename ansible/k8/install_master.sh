@@ -62,7 +62,6 @@ apt-get autoremove -y
 systemctl daemon-reload
 
 
-
 ### install podman
 . /etc/os-release
 echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:testing.list
@@ -171,7 +170,6 @@ EOF
 }
 
 
-
 ### start services
 systemctl daemon-reload
 systemctl enable containerd
@@ -191,7 +189,6 @@ echo "### install calico.yaml ##################################################
 kubectl apply -f https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/calico.yaml
 # kubectl apply -f k8/calico.yaml
 
-
 # etcdctl
 ETCDCTL_VERSION=v3.5.1
 ETCDCTL_ARCH=$(dpkg --print-architecture)
@@ -206,7 +203,7 @@ echo "### COMMAND TO ADD A WORKER NODE ###"
 # set +e
 # echo
 echo "### COMMAND TO ADD A WORKER NODE ###"
-kubeadm token create --print-join-command --ttl 0 || echo "WARN: Failed to generate join token (try manually after kubeadm is ready)"
+kubeadm token create --print-join-command --ttl 0 
 echo "CKS MASTER NODE SETUP COMPLETE"
 
 # set +e
