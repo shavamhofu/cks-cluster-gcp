@@ -5,16 +5,16 @@
     - name: Install master setup script
       ansible.builtin.shell: |
         curl -s k8/install_master.sh | bash
-  register: install_output
-  ignore_errors: yes
-  
-- name: Show install script output
-  debug:
-    var: install_output.stdout_lines
+      register: install_output
+      ignore_errors: yes
+      
+    - name: Show install script output
+      debug:
+        var: install_output.stdout_lines
 
-- name: Show install script error
-  debug:
-    var: install_output.stderr_lines  
+    - name: Show install script error
+      debug:
+        var: install_output.stderr_lines  
 # - name: Setup CKS Master Node
 #   hosts: masters
 #   become: yes
