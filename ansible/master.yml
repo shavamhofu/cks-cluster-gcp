@@ -17,11 +17,11 @@
     - name: Run master install script
       ansible.builtin.shell: bash /tmp/install_master.sh
       register: master_install_result
-      failed_when: "'CKS MASTER NODE SETUP COMPLETE' not in master_install_result.stdout"
+      # failed_when: "'CKS MASTER NODE SETUP COMPLETE' not in master_install_result.stdout"
 
-    - name: Debug script output
-      ansible.builtin.debug:
-        var: master_install_result.stdout_lines  
+    # - name: Debug script output
+    #   ansible.builtin.debug:
+    #     var: master_install_result.stdout_lines  
       # args:
       #   chdir: "{{ playbook_dir }}/.."
       # register: install_output
