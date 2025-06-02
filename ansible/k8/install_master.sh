@@ -2,7 +2,12 @@
 
 # Source: http://kubernetes.io/docs/getting-started-guides/kubeadm
 
-set -xe
+# set -xe
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+
 
 source /etc/lsb-release
 if [ "$DISTRIB_RELEASE" != "20.04" ]; then

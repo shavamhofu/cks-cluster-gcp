@@ -20,11 +20,19 @@
       #   chdir: "{{ playbook_dir }}/.."
       # register: install_output
       register: master_install_result
-      ignore_errors: yes
+      ignore_errors: true
+
+    - name: Show script stdout
+      debug:
+        var: master_install_result.stdout_lines
+
+    - name: Show script stderr
+      debug:
+        var: master_install_result.stderr_lines  
 
     - name: Fail if master install fails
       ansible.builtin.fail:
-        msg: "install_master.sh failed"
+        msg: "install_master.sh failed with rc {{ master_install_result.rc }}"
       when: master_install_result.rc != 0
 
     - name: Wait for kubeadm to be available
