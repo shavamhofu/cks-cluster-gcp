@@ -16,8 +16,8 @@
 
     - name: Run master install script
       ansible.builtin.shell: bash /tmp/install_master.sh
-      args:
-        chdir: "{{ playbook_dir }}/.."
+      # args:
+      #   chdir: "{{ playbook_dir }}/.."
       # register: install_output
       register: master_install_result
       ignore_errors: yes
