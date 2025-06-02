@@ -14,7 +14,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'destroy'
+        default: 'apply'
         type: choice
         options:
           - apply
@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -132,13 +132,15 @@ jobs:
         if: env.TF_ACTION == 'apply'
         run: |
           cd ansible
-          ansible-playbook -i inventory.ini master.yml  -e write_join_command=true 
+          ansible-playbook -i inventory.ini master.yml  
+        #   -e write_join_command=true 
         #   ansible-playbook -i inventory.ini worker.yml -vvvv 
 
       - name: 🛠️ Run Ansible Playbooks Worker
         if: env.TF_ACTION == 'apply'
         run: |
           cd ansible          
-          ansible-playbook -i inventory.ini worker.yml -e kube_join_cmd="{{ hostvars[groups['masters'][0]]['kube_join_cmd'] }}"
+          ansible-playbook -i inventory.ini worker.yml
+        #    -e kube_join_cmd="{{ hostvars[groups['masters'][0]]['kube_join_cmd'] }}"
 
 

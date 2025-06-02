@@ -19,43 +19,49 @@
       # args:
       #   chdir: "{{ playbook_dir }}/.."
       # register: install_output
-      register: master_install_result
-      ignore_errors: true
+    #   register: master_install_result
+    #   ignore_errors: true
 
-    - name: Show script stdout
-      debug:
-        var: master_install_result.stdout_lines
+    # - name: Show script stdout
+    #   debug:
+    #     var: master_install_result.stdout_lines
 
-    - name: Show script stderr
-      debug:
-        var: master_install_result.stderr_lines  
+    # - name: Show script stderr
+    #   debug:
+    #     var: master_install_result.stderr_lines  
 
-    - name: Fail if master install fails
-      ansible.builtin.fail:
-        msg: "install_master.sh failed with rc {{ master_install_result.rc }}"
-      when: master_install_result.rc != 0
+    # - name: Fail if master install fails
+    #   ansible.builtin.fail:
+    #     msg: "install_master.sh failed with rc {{ master_install_result.rc }}"
+    #   when: master_install_result.rc != 0
 
-    - name: Wait for kubeadm to be available
-      ansible.builtin.command: which kubeadm
-      register: kubeadm_check
-      retries: 5
-      delay: 10
-      until: kubeadm_check.rc == 0
-      become: yes
-
-    - name: Get kubeadm join command
-      ansible.builtin.shell: kubeadm token create --print-join-command
-      register: join_command
-      become: yes
+    # - name: Wait for kubeadm to be available
+    #   ansible.builtin.command: which kubeadm
+    #   register: kubeadm_check
+    #   retries: 5
+    #   delay: 10
+    #   until: kubeadm_check.rc == 0
+    #   become: yes
 
     # - name: Get kubeadm join command
     #   ansible.builtin.shell: kubeadm token create --print-join-command
     #   register: join_command
-    #   become: yes  
+    #   become: yes
+
+    # # - name: Get kubeadm join command
+    # #   ansible.builtin.shell: kubeadm token create --print-join-command
+    # #   register: join_command
+    # #   become: yes  
     
-    - name: Set fact with join command
-      ansible.builtin.set_fact:
-        kube_join_cmd: "{{ join_command.stdout }}"
+    # - name: Set fact with join command
+    #   ansible.builtin.set_fact:
+    #     kube_join_cmd: "{{ join_command.stdout }}"
+
+
+
+
+
+
     # - name: Install master setup script
     #   ansible.builtin.shell: |
     #     curl -s k8/install_master.sh | bash
