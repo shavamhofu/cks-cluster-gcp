@@ -202,4 +202,8 @@ rm -rf ${ETCDCTL_VERSION_FULL} ${ETCDCTL_VERSION_FULL}.tar.gz
 
 echo
 echo "### COMMAND TO ADD A WORKER NODE ###"
-kubeadm token create --print-join-command --ttl 0
+set +e
+echo
+echo "### COMMAND TO ADD A WORKER NODE ###"
+kubeadm token create --print-join-command --ttl 0 || echo "WARN: Failed to generate join token (try manually after kubeadm is ready)"
+echo "CKS MASTER NODE SETUP COMPLETE"

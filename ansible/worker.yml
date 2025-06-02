@@ -13,23 +13,23 @@
       register: install_output
       ignore_errors: yes
 
-    - name: Join Kubernetes cluster
-      ansible.builtin.shell: "{{ kube_join_cmd }}"
-      args:
-        executable: /bin/bash
-      become: yes
-      when: kube_join_cmd is defined  
+    # - name: Join Kubernetes cluster
+    #   ansible.builtin.shell: "{{ kube_join_cmd }}"
+    #   args:
+    #     executable: /bin/bash
+    #   become: yes
+    #   when: kube_join_cmd is defined  
 
-    - name: Show install script output
-      debug:
-        var: install_output.stdout_lines
+    # - name: Show install script output
+    #   debug:
+    #     var: install_output.stdout_lines
 
-    - name: Show install script error
-      debug:
-        var: install_output.stderr_lines  
-    - name: Print exit code
-      debug:
-        var: install_output.rc     
+    # - name: Show install script error
+    #   debug:
+    #     var: install_output.stderr_lines  
+    # - name: Print exit code
+    #   debug:
+    #     var: install_output.rc     
 
     # - name: Install master setup script
     #   ansible.builtin.shell: |

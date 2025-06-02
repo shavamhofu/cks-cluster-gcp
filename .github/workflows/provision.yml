@@ -132,7 +132,7 @@ jobs:
         if: env.TF_ACTION == 'apply'
         run: |
           cd ansible
-          ansible-playbook -i inventory.ini master.yml  
+          ansible-playbook -i inventory.ini master.yml  -vvvv
         #   -e write_join_command=true 
         #   ansible-playbook -i inventory.ini worker.yml -vvvv 
 
