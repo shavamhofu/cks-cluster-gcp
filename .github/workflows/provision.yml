@@ -27,7 +27,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:

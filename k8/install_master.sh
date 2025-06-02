@@ -2,7 +2,7 @@
 
 # Source: http://kubernetes.io/docs/getting-started-guides/kubeadm
 
-set -e
+set -xe
 
 source /etc/lsb-release
 if [ "$DISTRIB_RELEASE" != "20.04" ]; then
