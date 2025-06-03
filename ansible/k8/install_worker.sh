@@ -30,7 +30,7 @@ else
   echo "https://github.com/containerd/containerd/blob/main/docs/getting-started.md#option-1-from-the-official-binaries"
   exit 1
 fi
-
+echo "11111111111111111111111111111111111111111111111111111111111111111111111111111111"
 ### setup terminal
 apt-get --allow-unauthenticated update
 apt-get --allow-unauthenticated install -y bash-completion binutils
@@ -44,7 +44,7 @@ echo 'alias c=clear' >> ~/.bashrc
 echo 'complete -F __start_kubectl k' >> ~/.bashrc
 sed -i '1s/^/force_color_prompt=yes\n/' ~/.bashrc
 
-
+echo "22222222222222222222222222222222222222222222222222222222222222222222222222222"
 ### disable linux swap and remove any existing swap partitions
 swapoff -a
 sed -i '/\sswap\s/ s/^\(.*\)$/#\1/g' /etc/fstab
@@ -58,7 +58,7 @@ apt-get remove -y docker.io containerd kubelet kubeadm kubectl kubernetes-cni ||
 apt-get autoremove -y
 systemctl daemon-reload
 
-
+echo "3333333333333333333333333333333333333333333333333333333333333333333333333333333"
 
 ### install podman
 . /etc/os-release
@@ -71,7 +71,7 @@ cat <<EOF | sudo tee /etc/containers/registries.conf
 [registries.search]
 registries = ['docker.io']
 EOF
-
+echo "4444444444444444444444444444444444444444444444444444444444444444444444444444444444"
 
 ### install packages
 apt-get install -y apt-transport-https ca-certificates
@@ -86,7 +86,7 @@ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-1-32-apt-keyring.gpg] https://
 apt-get --allow-unauthenticated update
 apt-get --allow-unauthenticated install -y docker.io containerd kubelet=${KUBE_VERSION}-1.1 kubeadm=${KUBE_VERSION}-1.1 kubectl=${KUBE_VERSION}-1.1 kubernetes-cni
 apt-mark hold kubelet kubeadm kubectl kubernetes-cni
-
+echo "5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555"
 
 ### install containerd 1.6 over apt-installed-version
 wget https://github.com/containerd/containerd/releases/download/v1.6.12/containerd-1.6.12-linux-${PLATFORM}.tar.gz
@@ -96,7 +96,7 @@ mv bin/* /usr/bin
 rm -rf bin containerd-1.6.12-linux-${PLATFORM}.tar.gz
 systemctl unmask containerd
 systemctl start containerd
-
+echo "6666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666"
 
 ### containerd
 cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
@@ -113,7 +113,7 @@ EOF
 sudo sysctl --system
 sudo mkdir -p /etc/containerd
 
-
+echo "777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777"
 ### containerd config
 cat > /etc/containerd/config.toml <<EOF
 disabled_plugins = []
@@ -164,7 +164,7 @@ cat <<EOF | sudo tee /etc/default/kubelet
 KUBELET_EXTRA_ARGS="--container-runtime-endpoint unix:///run/containerd/containerd.sock"
 EOF
 }
-
+echo "8888888888888888888888888888888888888888888888888888888888888888888888888888888"
 ### start services
 systemctl daemon-reload
 systemctl enable containerd
@@ -175,8 +175,9 @@ systemctl enable kubelet && systemctl start kubelet
 kubeadm reset -f
 systemctl daemon-reload
 service kubelet start
-
+echo "9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"
 echo
 echo "EXECUTE ON MASTER: kubeadm token create --print-join-command --ttl 0"
 echo "THEN RUN THE OUTPUT AS COMMAND HERE TO ADD AS WORKER"
 echo
+echo "000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
