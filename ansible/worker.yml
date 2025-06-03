@@ -21,21 +21,25 @@
       ansible.builtin.shell: bash /tmp/install_worker.sh
       # args:
       #   chdir: "{{ playbook_dir }}/.."
-      register: install_output
+      register: worker_script_output
 
     - name: Debug worker script output
       debug:
-        var: worker_script_output.stdout_lines  
-
-    - name: Copy kubeadm join script from control to worker
-      ansible.builtin.copy:
-        src: /tmp/kubeadm_join.sh
-        dest: /tmp/kubeadm_join.sh
-        mode: '0755'
+        var: worker_script_output.stdout_lines 
 
     - name: Join worker to Kubernetes cluster
-      ansible.builtin.shell: bash /tmp/kubeadm_join.sh
-      when: worker_script_output.rc == 0
+      ansible.builtin.shell: "{{ hostvars['all_workers'].kube_join_cmd }}"
+      when: worker_script_output.rc == 0  
+
+    # - name: Copy kubeadm join script from control to worker
+    #   ansible.builtin.copy:
+    #     src: /tmp/kubeadm_join.sh
+    #     dest: /tmp/kubeadm_join.sh
+    #     mode: '0755'
+
+    # - name: Join worker to Kubernetes cluster
+    #   ansible.builtin.shell: bash /tmp/kubeadm_join.sh
+    #   when: worker_script_output.rc == 0
 
 
     # - name: Wait for master to write join command file
