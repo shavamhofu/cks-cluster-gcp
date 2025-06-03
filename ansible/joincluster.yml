@@ -17,14 +17,14 @@
       wait_for:
         path: /tmp/kubeadm_join.sh
         timeout: 120
-      delegate_to: master
+      delegate_to: masters
 
     - name: Fetch join command from master
       fetch:
         src: /tmp/kubeadm_join.sh
         dest: /tmp/kubeadm_join.sh
         flat: yes
-      delegate_to: master
+      delegate_to: masters
 
     - name: Copy join command to worker
       copy:
