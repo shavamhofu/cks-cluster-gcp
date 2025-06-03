@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -22,7 +22,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -138,10 +138,10 @@ jobs:
           ansible-playbook -i inventory.ini worker.yml -vvvv         
         # -e kube_join_cmd="{{ hostvars[groups['masters'][0]]['kube_join_cmd'] }}"
 
-      - name: 🛠️ Run Ansible Join Cluster
-        if: env.TF_ACTION == 'apply'
-        run: |
-          cd ansible          
-          ansible-playbook -i inventory.ini joincluster.yml -vvvv
+    #   - name: 🛠️ Run Ansible Join Cluster
+    #     if: env.TF_ACTION == 'apply'
+    #     run: |
+    #       cd ansible          
+    #       ansible-playbook -i inventory.ini joincluster.yml -vvvv
 
 
