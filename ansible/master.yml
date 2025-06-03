@@ -26,6 +26,7 @@
         module: copy
         content: "{{ join_cmd.stdout }}"
         dest: /tmp/kubeadm_join_cmd.sh
+        mode: '0755'
       delegate_to: localhost
       run_once: true
 
