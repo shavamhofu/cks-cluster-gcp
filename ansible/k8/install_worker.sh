@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Source: http://kubernetes.io/docs/getting-started-guides/kubeadm
-
+export PYTHONUNBUFFERED=1
 set -e
 
 source /etc/lsb-release

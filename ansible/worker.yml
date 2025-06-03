@@ -9,9 +9,14 @@
         mode: '0755'
 
     - name: Run master install script
-      ansible.builtin.shell: bash /tmp/install_worker.sh
-      register: install_output
+      # ansible.builtin.shell: bash /tmp/install_worker.sh
+      ansible.builtin.script: bash /tmp/install_worker.sh
+      register: worker_script_output
       ignore_errors: yes
+
+    - name: Debug worker script output
+      debug:
+        var: worker_script_output.stdout_lines  
 
     # - name: Wait for master to write join command file
     #   wait_for:
