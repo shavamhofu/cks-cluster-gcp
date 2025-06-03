@@ -2,21 +2,26 @@
   hosts: workers
   become: yes
   tasks:
-    # - name: Copy master install script to remote
-    #   ansible.builtin.copy:
-    #     src: k8/install_worker.sh
-    #     dest: /tmp/install_worker.sh
-    #     mode: '0755'
+    - name: Copy master install script to remote
+      ansible.builtin.copy:
+        src: k8/install_worker.sh
+        dest: /tmp/install_worker.sh
+        mode: '0755'
 
-    - name: Run master install script
-      ansible.builtin.shell: |
-        bash <(curl -s https://raw.githubusercontent.com/shavamhofu/cks-cluster-gcp/main/ansible/k8/install_worker.sh)
-      args:
-        executable: /bin/bash
-      # ansible.builtin.shell: bash /tmp/install_worker.sh
-      # ansible.builtin.script: bash ansible/k8/install_worker.sh
-      register: worker_script_output
+    # - name: Run master install script
+    #   # ansible.builtin.shell: |
+    #   #   bash <(curl -s https://raw.githubusercontent.com/shavamhofu/cks-cluster-gcp/main/ansible/k8/install_worker.sh)
+    #   # args:
+    #   #   executable: /bin/bash
+    #   ansible.builtin.shell: bash /tmp/install_worker.sh
+    #   # ansible.builtin.script: bash ansible/k8/install_worker.sh
+    #   register: worker_script_output
       # ignore_errors: yes
+    - name: Run master install script
+      ansible.builtin.shell: bash /tmp/install_worker.sh
+      # args:
+      #   chdir: "{{ playbook_dir }}/.."
+      register: install_output
 
     - name: Debug worker script output
       debug:
@@ -28,20 +33,20 @@
     #     timeout: 120
     #   delegate_to: masters
 
-    - name: Fetch join command from master
-      fetch:
-        src: /tmp/kubeadm_join.sh
-        dest: /tmp/kubeadm_join.sh
-        flat: yes
-      delegate_to: masters
+    # - name: Fetch join command from master
+    #   fetch:
+    #     src: /tmp/kubeadm_join.sh
+    #     dest: /tmp/kubeadm_join.sh
+    #     flat: yes
+    #   delegate_to: masters
 
-    - name: Copy join command to worker
-      copy:
-        src: /tmp/kubeadm_join.sh
-        dest: /tmp/kubeadm_join.sh
-        mode: '0755'
+    # - name: Copy join command to worker
+    #   copy:
+    #     src: /tmp/kubeadm_join.sh
+    #     dest: /tmp/kubeadm_join.sh
+    #     mode: '0755'
 
-    - name: Join Kubernetes Cluster
-      shell: bash /tmp/kubeadm_join.sh  
+    # - name: Join Kubernetes Cluster
+    #   shell: bash /tmp/kubeadm_join.sh  
     
     

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Source: http://kubernetes.io/docs/getting-started-guides/kubeadm
-export PYTHONUNBUFFERED=1
+# export PYTHONUNBUFFERED=1
 set -e
 
 source /etc/lsb-release
@@ -45,6 +45,7 @@ echo 'complete -F __start_kubectl k' >> ~/.bashrc
 sed -i '1s/^/force_color_prompt=yes\n/' ~/.bashrc
 
 echo "22222222222222222222222222222222222222222222222222222222222222222222222222222"
+
 ### disable linux swap and remove any existing swap partitions
 swapoff -a
 sed -i '/\sswap\s/ s/^\(.*\)$/#\1/g' /etc/fstab
