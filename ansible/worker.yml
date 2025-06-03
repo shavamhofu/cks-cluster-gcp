@@ -17,7 +17,7 @@
     #   # ansible.builtin.script: bash ansible/k8/install_worker.sh
     #   register: worker_script_output
       # ignore_errors: yes
-    - name: Run master install script
+    - name: Run worker install script
       ansible.builtin.shell: bash /tmp/install_worker.sh
       # args:
       #   chdir: "{{ playbook_dir }}/.."
@@ -67,5 +67,39 @@
 
     # - name: Join Kubernetes Cluster
     #   shell: bash /tmp/kubeadm_join.sh  
+
+#     master
+#     - name: Get kubeadm join command from master
+#       ansible.builtin.command: kubeadm token create --print-join-command --ttl 0
+#       register: join_cmd
+#       when: install_output.rc == 0
+#       changed_when: false
+
+#     - name: Set join command for use in other plays
+#       add_host:
+#         name: "all_workers"
+#         kube_join_cmd: "{{ join_cmd.stdout }}"  
+#       when: install_output.rc == 0
+
+#   worker
+#     - name: Run worker install script
+#       ansible.builtin.shell: bash /tmp/install_worker.sh
+#       # args:
+#       #   chdir: "{{ playbook_dir }}/.."
+#       register: worker_script_output
+
+#     - name: Debug worker script output
+#       debug:
+#         var: worker_script_output.stdout_lines 
+
+#     - name: Join worker to Kubernetes cluster
+#       ansible.builtin.shell: "{{ hostvars['all_workers'].kube_join_cmd }}"
+#       when: worker_script_output.rc == 0  
+#       ignore_errors: yes
+
+#     - name: Show join attempt output
+#       debug:
+#         var: join_attempt_output  
+#  the  kube_join_cmd is not running and i do not see the error what could be the problem      
     
     

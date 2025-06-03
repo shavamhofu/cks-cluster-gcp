@@ -39,7 +39,7 @@
     #   set_fact:
     #     kube_join_cmd: "{{ join_cmd.stdout }}"
 
-    - name: Set join command for use in other plays
-      add_host:
-        name: "all_workers"
-        kube_join_cmd: "{{ join_cmd.stdout }}"
+    # - name: Set join command for use in other plays
+    #   add_host:
+    #     name: "all_workers"
+    #     kube_join_cmd: "{{ join_cmd.stdout }}"
