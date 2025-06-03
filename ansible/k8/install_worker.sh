@@ -103,7 +103,10 @@ cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
 overlay
 br_netfilter
 EOF
+sudo apt-get update
+sudo apt-get install -y kmod
 sudo modprobe overlay
+
 sudo modprobe br_netfilter
 cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
 net.bridge.bridge-nf-call-iptables  = 1
