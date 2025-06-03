@@ -2,11 +2,11 @@
   hosts: workers
   become: yes
   tasks:
-    - name: Copy master install script to remote
-      ansible.builtin.copy:
-        src: k8/install_worker.sh
-        dest: /tmp/install_worker.sh
-        mode: '0755'
+    # - name: Copy master install script to remote
+    #   ansible.builtin.copy:
+    #     src: k8/install_worker.sh
+    #     dest: /tmp/install_worker.sh
+    #     mode: '0755'
 
     - name: Run master install script
       ansible.builtin.shell: |
@@ -16,7 +16,7 @@
       # ansible.builtin.shell: bash /tmp/install_worker.sh
       # ansible.builtin.script: bash ansible/k8/install_worker.sh
       register: worker_script_output
-      ignore_errors: yes
+      # ignore_errors: yes
 
     - name: Debug worker script output
       debug:
