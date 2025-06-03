@@ -27,32 +27,3 @@
         dest: "/tmp/kubeadm_join_cmd.sh"
       delegate_to: localhost
       run_once: true  
-
-    # - name: Set join command for use in other plays
-    #   add_host:
-    #     name: "all_workers"
-    #     kube_join_cmd: "{{ join_cmd.stdout }}"  
-    #   when: install_output.rc == 0
-    # - name: Save kubeadm join command globally
-    #   set_fact:
-    #     kube_join_cmd: "{{ join_cmd.stdout }}"
-    #   delegate_to: localhost
-    #   run_once: true 
-
-    # - name: Save join command to file (on localhost)
-    #   local_action:
-    #     module: copy
-    #     content: "{{ join_cmd.stdout }}"
-    #     dest: /tmp/kubeadm_join_cmd.sh
-    #     mode: '0755'
-    #   delegate_to: localhost
-    #   run_once: true
-
-    # - name: Set join command fact
-    #   set_fact:
-    #     kube_join_cmd: "{{ join_cmd.stdout }}"
-
-    # - name: Set join command for use in other plays
-    #   add_host:
-    #     name: "all_workers"
-    #     kube_join_cmd: "{{ join_cmd.stdout }}"

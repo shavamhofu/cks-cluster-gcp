@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -22,33 +22,25 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-    #   - name: ☁️ Set up Google Cloud SDK
-    #     uses: google-github-actions/setup-gcloud@v2
-    #     with:
-    #       project_id: ${{ env.GCP_PROJECT }}
-    #       service_account_key: ${{ secrets.GCP_SA_KEY }}
-    #       export_default_credentials: true
-
+ 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
-          export_default_credentials: true      
+          export_default_credentials: true    
       
-           
-
       - name: 🧰 Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
-
+# terraform
       - name: 📦 Terraform Init
         # if: env.TF_ACTION == 'apply'
         run: terraform init
@@ -65,26 +57,14 @@ jobs:
             cd terraform
             terraform destroy -auto-approve
 
-    #   - name: Get Terraform Outputs
-    #     if: env.TF_ACTION == 'apply'
-    #     id: tf-output
-    #     run: |
-    #         echo "NODES_IPS=$(terraform output -json instance_ips | jq -r '.[]' | paste -sd " ")" >> $GITHUB_ENV      
-      
+ #  ansible
       - name: Install Ansible & Utils
         if: env.TF_ACTION == 'apply'
         run: |
             sudo apt-get update
             sudo apt-get install -y ansible openssh-client inetutils-ping netcat-openbsd jq
 
-    #   - name: Setup SSH key
-    #     if: env.TF_ACTION == 'apply'
-    #     run: |
-    #         mkdir -p ~/.ssh
-    #         echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-    #         chmod 600 ~/.ssh/id_rsa
-    #     env:
-    #       VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}      
+     
       - name: 🔑 Extract and Save Terraform SSH Private Key
         if: env.TF_ACTION == 'apply'
         run: |
@@ -122,7 +102,7 @@ jobs:
         #     echo "🔐 Scanning SSH key for $host..."
         #     ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null
         #   done
-
+# play books
       - name: 🛠️ Run Ansible Playbooks Master
         if: env.TF_ACTION == 'apply'
         run: |
@@ -136,12 +116,6 @@ jobs:
         run: |
           cd ansible          
           ansible-playbook -i inventory.ini worker.yml -vvvv         
-        # -e kube_join_cmd="{{ hostvars[groups['masters'][0]]['kube_join_cmd'] }}"
-
-    #   - name: 🛠️ Run Ansible Join Cluster
-    #     if: env.TF_ACTION == 'apply'
-    #     run: |
-    #       cd ansible          
-    #       ansible-playbook -i inventory.ini joincluster.yml -vvvv
+      
 
 
