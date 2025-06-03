@@ -23,18 +23,28 @@
       #   chdir: "{{ playbook_dir }}/.."
       register: worker_script_output
 
-    - name: Debug worker script output
-      debug:
-        var: worker_script_output.stdout_lines 
-
     - name: Join worker to Kubernetes cluster
-      ansible.builtin.shell: "{{ hostvars['all_workers'].kube_join_cmd }}"
-      when: worker_script_output.rc == 0  
+      ansible.builtin.shell: "{{ hostvars['localhost'].kube_join_cmd }}"
+      when: worker_script_output.rc == 0
+      register: join_attempt_output
       ignore_errors: yes
 
     - name: Show join attempt output
       debug:
-        var: join_attempt_output  
+        var: join_attempt_output.stdout_lines
+
+    # - name: Debug worker script output
+    #   debug:
+    #     var: worker_script_output.stdout_lines 
+
+    # - name: Join worker to Kubernetes cluster
+    #   ansible.builtin.shell: "{{ hostvars['all_workers'].kube_join_cmd }}"
+    #   when: worker_script_output.rc == 0  
+    #   ignore_errors: yes
+
+    # - name: Show join attempt output
+    #   debug:
+    #     var: join_attempt_output  
     # - name: Copy kubeadm join script from control to worker
     #   ansible.builtin.copy:
     #     src: /tmp/kubeadm_join.sh

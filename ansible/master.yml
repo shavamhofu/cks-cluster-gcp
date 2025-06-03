@@ -21,11 +21,17 @@
       when: install_output.rc == 0
       changed_when: false
 
-    - name: Set join command for use in other plays
-      add_host:
-        name: "all_workers"
-        kube_join_cmd: "{{ join_cmd.stdout }}"  
-      when: install_output.rc == 0
+    # - name: Set join command for use in other plays
+    #   add_host:
+    #     name: "all_workers"
+    #     kube_join_cmd: "{{ join_cmd.stdout }}"  
+    #   when: install_output.rc == 0
+    - name: Save kubeadm join command globally
+      set_fact:
+        kube_join_cmd: "{{ join_cmd.stdout }}"
+      delegate_to: localhost
+      run_once: true 
+
     # - name: Save join command to file (on localhost)
     #   local_action:
     #     module: copy
