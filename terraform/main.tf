@@ -74,10 +74,10 @@ resource "google_compute_firewall" "nodeports" {
   network = "default"
 
 #   added port 22 to allow ssh from my local machine
-
+# 10250 is for celium to all node communication
   allow {
     protocol = "tcp"
-    ports    = ["30000-40000","22","6443"]
+    ports    = ["30000-40000","22","6443","10250"]
   }
 
   source_ranges = ["0.0.0.0/0"]
