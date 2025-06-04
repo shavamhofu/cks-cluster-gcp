@@ -184,8 +184,8 @@ mkdir -p ~/.kube
 sudo cp -i /etc/kubernetes/admin.conf ~/.kube/config
 
 ### CNI
-kubectl apply -f https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/calico.yaml
-
+# kubectl apply -f https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/calico.yaml
+kubectl apply -f https://raw.githubusercontent.com/shavamhofu/cks-cluster-gcp/main/ansible/k8/calico.yaml
 
 # etcdctl
 ETCDCTL_VERSION=v3.5.1
