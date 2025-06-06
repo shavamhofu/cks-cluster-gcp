@@ -69,6 +69,26 @@ resource "google_compute_instance" "cks-worker" {
   tags = ["cks-node"]
 }
 
+resource "google_compute_firewall" "allow-node-egress-dns-https" {
+  name    = "allow-node-egress-dns-https"
+  network = "default"
+
+  direction = "EGRESS"
+  priority  = 1000
+
+  allow {
+    protocol = "udp"
+    ports    = ["53"]
+  }
+  allow {
+    protocol = "tcp"
+    ports    = ["53", "443"]
+  }
+
+  destination_ranges = ["0.0.0.0/0"]
+  target_tags        = ["cks-node"]
+}
+
 resource "google_compute_firewall" "nodeports" {
   name    = "nodeports"
   network = "default"
