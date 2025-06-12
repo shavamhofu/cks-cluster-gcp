@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'destroy'
+        default: 'apply'
         type: choice
         options:
           - apply
@@ -22,7 +22,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -66,12 +66,14 @@ jobs:
 
      
       - name: 🔑 Extract and Save Terraform SSH Private Key
+        id: extract_key
         if: env.TF_ACTION == 'apply'
         run: |
             PRIVATE_KEY=$(terraform output -raw private_key_pem)
             mkdir -p ~/.ssh
             echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
+            echo "private_key_pem=$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
         working-directory: terraform      
 
       - name: 🧾 Generate Ansible Inventory
@@ -106,6 +108,7 @@ jobs:
       - name: 🛠️ Run Ansible Playbooks Master
         if: env.TF_ACTION == 'apply'
         run: |
+          export PRIVATE_KEY_PEM="${{ steps.extract_key.outputs.private_key_pem }}"
           cd ansible
           ansible-playbook -i inventory.ini master.yml  -vvvv
         #   -e write_join_command=true 

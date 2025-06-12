@@ -89,6 +89,22 @@ resource "google_compute_firewall" "allow-node-egress-dns-https" {
   target_tags        = ["cks-node"]
 }
 
+//allows ssh from each node
+resource "google_compute_firewall" "internal-ssh" {
+  name    = "cks-internal-ssh"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_tags = ["cks-node"]
+  target_tags = ["cks-node"]
+  direction   = "INGRESS"
+  priority    = 1001
+}
+
 resource "google_compute_firewall" "nodeports" {
   name    = "nodeports"
   network = "default"

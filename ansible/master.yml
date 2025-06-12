@@ -14,7 +14,22 @@
       #   chdir: "{{ playbook_dir }}/.."
       register: install_output
       ignore_errors: yes
+    - name: Ensure SSH directory exists
+      file:
+        path: /home/ubuntu/.ssh
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0700'
 
+    - name: Copy private SSH key to master node for intra-node SSH
+      copy:
+        content: "{{ lookup('env', 'PRIVATE_KEY_PEM') }}"
+        dest: /home/ubuntu/.ssh/id_rsa
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'
+    
     - name: Get kubeadm join command from master
       ansible.builtin.command: kubeadm token create --print-join-command --ttl 0
       register: join_cmd
