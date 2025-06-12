@@ -163,8 +163,16 @@ jobs:
       - name: 🛠️ Run Ansible Playbooks Worker
         if: env.TF_ACTION == 'apply'
         run: |
-          cd ansible          
-          ansible-playbook -i inventory.ini worker.yml -vvvv         
+          mkdir -p temp_vars       
+          echo '{"private_key_pem": ${{ toJson(steps.extract_key.outputs.private_key_pem) }}}' > temp_vars/ansible_vars.json
+          ansible-playbook -i inventory.ini worker.yml  --extra-vars "@temp_vars/ansible_vars.json"
+        #   ansible-playbook -i inventory.ini worker.yml -vvvv  
+     
+      - name: 🛠️ Run Install Falco
+        if: env.TF_ACTION == 'apply'
+        run: |
+          ansible-playbook -i inventory.ini install_falco.yml
+        
       
 
 

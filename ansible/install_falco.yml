@@ -1,0 +1,52 @@
+---
+- name: Install Falco on Kubernetes nodes
+  hosts: k8s_cluster
+  become: yes
+
+  tasks:
+    - name: Install required dependencies
+      apt:
+        name:
+          - curl
+          - gnupg
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+        state: present
+        update_cache: yes
+
+    - name: Add Falco GPG key
+      apt_key:
+        url: https://falco.org/repo/falcosecurity-packages.asc
+        state: present
+
+    - name: Add Falco repository
+      apt_repository:
+        repo: "deb https://download.falco.org/packages/deb stable main"
+        state: present
+        filename: falcosecurity
+
+    - name: Install Falco
+      apt:
+        name: falco
+        state: present
+        update_cache: yes
+
+    - name: Ensure Falco is running
+      systemd:
+        name: falco
+        state: started
+        enabled: yes
+    
+    - name: Copy custom Falco rules
+      copy:
+        src: custom_rules.yaml
+        dest: /etc/falco/falco_rules.local.yaml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart Falco to load custom rules
+      systemd:
+        name: falco
+        state: restarted

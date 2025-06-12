@@ -1,0 +1,7 @@
+- rule: Detect shell in container
+  desc: Detects a shell running inside a container
+  condition: container.id != host and proc.name in (bash, sh, zsh)
+  output: >
+    Shell spawned in container (user=%user.name command=%proc.cmdline container=%container.id image=%container.image.repository)
+  priority: WARNING
+  tags: [container, shell, process]

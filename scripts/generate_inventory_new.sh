@@ -16,6 +16,9 @@ $MASTER_IP ansible_user=ubuntu ansible_host=$MASTER_IP ansible_ssh_private_key_f
 
 [workers]
 $WORKER_IP ansible_user=ubuntu ansible_host=$WORKER_IP ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+masters
+workers
 EOF
 
 echo "✅ Inventory generated at ansible/inventory.ini"
