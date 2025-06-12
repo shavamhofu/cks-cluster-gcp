@@ -23,6 +23,10 @@
         group: ubuntu
         mode: '0700'
 
+    - name: Print private key length (debug)
+      debug:
+        msg: "Length of private_key_pem: {{ private_key_pem | length }}" 
+
     - name: Copy private SSH key to master node for intra-node SSH
       copy:
         # content: "{{ lookup('env', 'PRIVATE_KEY_PEM') }}"
