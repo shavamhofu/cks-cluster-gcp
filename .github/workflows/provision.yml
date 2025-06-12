@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -22,7 +22,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -112,7 +112,7 @@ jobs:
         run: |
           PRIVATE_KEY_PEM="${{ steps.extract_key.outputs.private_key_pem }}"
           cd ansible 
-          ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${PRIVATE_KEY}" 2>&1 | sed 's/${PRIVATE_KEY}/[PRIVATE_KEY]/g'
+          ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${PRIVATE_KEY_PEM}" 2>&1 | sed 's/${PRIVATE_KEY_PEM}/[PRIVATE_KEY]/g'
        #   ansible-playbook -i inventory.ini master.yml -vvvv --extra-vars "private_key_pem='${PRIVATE_KEY}'"
           #   ansible-playbook -i inventory.ini master.yml  -vvvv
         #   -e write_join_command=true 
