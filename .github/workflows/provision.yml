@@ -77,18 +77,35 @@ jobs:
     #         echo "$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
     #         echo "EOF" >> "$GITHUB_OUTPUT"
     #     working-directory: terraform
+    #   - name: 🔑 Extract and Save Terraform SSH Private Key
+    #     id: extract_key
+    #     if: env.TF_ACTION == 'apply'
+    #     run: |
+    #         mkdir -p ~/.ssh
+    #         terraform output -raw private_key_pem > ~/.ssh/id_rsa
+    #         chmod 600 ~/.ssh/id_rsa
+
+    #         echo "private_key_pem<<EOF" >> "$GITHUB_OUTPUT"
+    #         cat ~/.ssh/id_rsa >> "$GITHUB_OUTPUT"
+    #         echo "EOF" >> "$GITHUB_OUTPUT"
+    #     working-directory: terraform   
       - name: 🔑 Extract and Save Terraform SSH Private Key
         id: extract_key
         if: env.TF_ACTION == 'apply'
         run: |
+            # Get the private key and store it with correct permissions
+            PRIVATE_KEY=$(terraform output -raw private_key_pem)
             mkdir -p ~/.ssh
-            terraform output -raw private_key_pem > ~/.ssh/id_rsa
+            echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
 
-            echo "private_key_pem<<EOF" >> "$GITHUB_OUTPUT"
-            cat ~/.ssh/id_rsa >> "$GITHUB_OUTPUT"
-            echo "EOF" >> "$GITHUB_OUTPUT"
-        working-directory: terraform      
+            # Correct multiline-safe output to GitHub Actions
+            {
+            echo "private_key_pem<<EOF"
+            echo "$PRIVATE_KEY"
+            echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+        working-directory: terraform   
 
       - name: 🧾 Generate Ansible Inventory
         if: env.TF_ACTION == 'apply'
@@ -126,7 +143,7 @@ jobs:
     #       cd ansible 
     #       ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${PRIVATE_KEY_PEM}" 2>&1 | sed 's/${PRIVATE_KEY_PEM}/[PRIVATE_KEY]/g'
        #   ansible-playbook -i inventory.ini master.yml -vvvv --extra-vars "private_key_pem='${PRIVATE_KEY}'"
-          #   ansible-playbook -i inventory.ini master.yml  -vvvv
+        #   ansible-playbook -i inventory.ini master.yml  -vvvv
         #   -e write_join_command=true 
         #   ansible-playbook -i inventory.ini worker.yml -vvvv 
 
@@ -134,6 +151,7 @@ jobs:
         if: env.TF_ACTION == 'apply'
         working-directory: ansible
         run: |
+            # ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
             ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
 
 
