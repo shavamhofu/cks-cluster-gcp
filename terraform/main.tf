@@ -26,7 +26,7 @@ resource "google_compute_instance" "cks-master" {
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-2004-focal-v20220419"
+      image = "ubuntu-os-cloud/ubuntu-2404-lts"
       size  = 50
     }
   }
@@ -51,7 +51,7 @@ resource "google_compute_instance" "cks-worker" {
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-2004-focal-v20220419"
+      image = "ubuntu-os-cloud/ubuntu-2404-lts"
       size  = 50
     }
   }
