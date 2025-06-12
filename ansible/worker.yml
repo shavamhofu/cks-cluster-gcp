@@ -13,6 +13,27 @@
       # args:
       #   chdir: "{{ playbook_dir }}/.."
       register: worker_script_output
+
+    - name: Ensure SSH directory exists
+      file:
+        path: /home/ubuntu/.ssh
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0700'
+
+    - name: Print private key length (debug)
+      debug:
+        msg: "Length of private_key_pem_wk: {{ private_key_pem_wk | length }}" 
+
+    - name: Copy private SSH key to master node for intra-node SSH
+      copy:
+        # content: "{{ lookup('env', 'PRIVATE_KEY_PEM') }}"
+        content: "{{ private_key_pem_wk }}"
+        dest: /home/ubuntu/.ssh/id_rsa
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'  
     
     - name: Read join command from file
       set_fact:
