@@ -26,7 +26,7 @@ resource "google_compute_instance" "cks-master" {
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2404-lts"
+      image = "ubuntu-os-cloud/ubuntu-2404-noble-amd64-v20250606"
       size  = 50
     }
   }
@@ -51,7 +51,7 @@ resource "google_compute_instance" "cks-worker" {
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2404-lts"
+      image = "ubuntu-os-cloud/ubuntu-2404-noble-amd64-v20250606"
       size  = 50
     }
   }
