@@ -151,8 +151,13 @@ jobs:
         if: env.TF_ACTION == 'apply'
         working-directory: ansible
         run: |
-            # ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
-            ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
+          mkdir -p temp_vars
+          echo '{"private_key_pem": ${{ toJson(steps.extract_key.outputs.private_key_pem) }}}' > temp_vars/ansible_vars.json
+          cd ansible
+          ansible-playbook -i inventory.ini master.yml --extra-vars "@../temp_vars/ansible_vars.json"
+        # run: |
+        #     # ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
+        #     ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
 
 
       - name: 🛠️ Run Ansible Playbooks Worker
