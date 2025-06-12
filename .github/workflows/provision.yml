@@ -57,6 +57,17 @@ jobs:
             cd terraform
             terraform destroy -auto-approve
 
+       # ⛑️ Fallback: Push errored state if apply fails
+      - name: Push state if terraform fails
+        if: failure()
+        run: |
+          if [ -f errored.tfstate ]; then
+            echo "Found errored.tfstate, attempting to push to backend..."
+            terraform state push errored.tfstate
+          else
+            echo "No errored.tfstate found, skipping state push."
+          fi 
+
  #  ansible
       - name: Install Ansible & Utils
         if: env.TF_ACTION == 'apply'
