@@ -154,7 +154,7 @@ jobs:
           mkdir -p temp_vars
           echo '{"private_key_pem": ${{ toJson(steps.extract_key.outputs.private_key_pem) }}}' > temp_vars/ansible_vars.json
         
-          ansible-playbook -i inventory.ini master.yml --extra-vars "@temp_vars/ansible_vars.json"
+          ansible-playbook -i inventory.ini master.yml -vvvv --extra-vars "@temp_vars/ansible_vars.json"
         # run: |
         #     # ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
         #     ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
