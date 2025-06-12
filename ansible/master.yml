@@ -14,6 +14,7 @@
       #   chdir: "{{ playbook_dir }}/.."
       register: install_output
       ignore_errors: yes
+
     - name: Ensure SSH directory exists
       file:
         path: /home/ubuntu/.ssh
@@ -24,7 +25,8 @@
 
     - name: Copy private SSH key to master node for intra-node SSH
       copy:
-        content: "{{ lookup('env', 'PRIVATE_KEY_PEM') }}"
+        # content: "{{ lookup('env', 'PRIVATE_KEY_PEM') }}"
+        content: "{{ private_key_pem }}"
         dest: /home/ubuntu/.ssh/id_rsa
         owner: ubuntu
         group: ubuntu
