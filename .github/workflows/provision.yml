@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -22,7 +22,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -65,16 +65,28 @@ jobs:
             sudo apt-get install -y ansible openssh-client inetutils-ping netcat-openbsd jq
 
      
+    #   - name: 🔑 Extract and Save Terraform SSH Private Key
+    #     id: extract_key
+    #     if: env.TF_ACTION == 'apply'
+    #     run: |
+    #         PRIVATE_KEY=$(terraform output -raw private_key_pem)
+    #         mkdir -p ~/.ssh
+    #         echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
+    #         chmod 600 ~/.ssh/id_rsa
+    #         echo "private_key_pem<<EOF" >> "$GITHUB_OUTPUT"
+    #         echo "$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
+    #         echo "EOF" >> "$GITHUB_OUTPUT"
+    #     working-directory: terraform
       - name: 🔑 Extract and Save Terraform SSH Private Key
         id: extract_key
         if: env.TF_ACTION == 'apply'
         run: |
-            PRIVATE_KEY=$(terraform output -raw private_key_pem)
             mkdir -p ~/.ssh
-            echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
+            terraform output -raw private_key_pem > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
+
             echo "private_key_pem<<EOF" >> "$GITHUB_OUTPUT"
-            echo "$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
+            cat ~/.ssh/id_rsa >> "$GITHUB_OUTPUT"
             echo "EOF" >> "$GITHUB_OUTPUT"
         working-directory: terraform      
 
