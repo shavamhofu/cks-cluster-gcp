@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -22,7 +22,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -169,6 +169,13 @@ jobs:
           ansible-playbook -i inventory.ini worker.yml  --extra-vars "@temp_worker_vars/ansible_vars.json"
         #   ansible-playbook -i inventory.ini worker.yml -vvvv  
      
+      - name: 🛠️ Run Install Falco
+        if: env.TF_ACTION == 'apply'
+        working-directory: ansible
+        run: |
+          ansible-playbook -i inventory.ini install_falco.yml
+
+
       - name: 🛠️ Run Install Falco
         if: env.TF_ACTION == 'apply'
         working-directory: ansible
