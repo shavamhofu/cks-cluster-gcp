@@ -73,7 +73,9 @@ jobs:
             mkdir -p ~/.ssh
             echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-            echo "private_key_pem=$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
+            echo "private_key_pem<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
         working-directory: terraform      
 
       - name: 🧾 Generate Ansible Inventory
