@@ -35,6 +35,36 @@
         owner: ubuntu
         group: ubuntu
         mode: '0600'
+
+    - name: Ensure root SSH directory exists
+      file:
+        path: /root/.ssh
+        state: directory
+        owner: root
+        group: root
+        mode: '0700' 
+
+    - name: Add public key to root authorized_keys
+      authorized_key:
+        user: root
+        key: "{{ public_key_openssh }}" 
+
+    - name: Copy private key to root
+      copy:
+        content: "{{ private_key_pem }}"
+        dest: /root/.ssh/id_rsa
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Add target hosts to known_hosts
+      known_hosts:
+        path: /home/ubuntu/.ssh/known_hosts
+        name: "{{ item }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan -H ' + item) }}"
+      loop:
+        - cks-worker
+        - cks-master
     
     - name: Get kubeadm join command from master
       ansible.builtin.command: kubeadm token create --print-join-command --ttl 0
