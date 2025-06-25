@@ -41,6 +41,25 @@ resource "google_compute_instance" "cks-master" {
       ubuntu:${tls_private_key.vm_ssh.public_key_openssh}
       root:${tls_private_key.vm_ssh.public_key_openssh}
     EOT
+
+      startup-script = <<-SCRIPT
+    #!/bin/bash
+
+    # Ensure root .ssh exists
+    mkdir -p /root/.ssh
+    chmod 700 /root/.ssh
+
+    # Pre-populate known_hosts using internal DNS name
+    ssh-keyscan -H cks-worker >> /root/.ssh/known_hosts
+
+    # Optional: resolve IP and scan it too (safe fallback)
+    worker_ip=$(getent hosts cks-worker | awk '{ print $1 }')
+    if [ -n "$worker_ip" ]; then
+      ssh-keyscan -H "$worker_ip" >> /root/.ssh/known_hosts
+    fi
+
+    chmod 600 /root/.ssh/known_hosts
+      SCRIPT
   }
 
   # metadata = {
