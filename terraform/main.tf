@@ -37,9 +37,16 @@ resource "google_compute_instance" "cks-master" {
   }
 
   metadata = {
-    # ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
-    ssh-keys = "ubuntu:${tls_private_key.vm_ssh.public_key_openssh}"
+    ssh-keys = <<EOT
+      ubuntu:${tls_private_key.vm_ssh.public_key_openssh}
+      root:${tls_private_key.vm_ssh.public_key_openssh}
+    EOT
   }
+
+  # metadata = {
+  #   # ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+  #   ssh-keys = "ubuntu:${tls_private_key.vm_ssh.public_key_openssh}"
+  # }
 
   tags = ["cks-node"]
 }
@@ -62,9 +69,16 @@ resource "google_compute_instance" "cks-worker" {
   }
 
   metadata = {
-    # ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
-    ssh-keys = "ubuntu:${tls_private_key.vm_ssh.public_key_openssh}"
+    ssh-keys = <<EOT
+      ubuntu:${tls_private_key.vm_ssh.public_key_openssh}
+      root:${tls_private_key.vm_ssh.public_key_openssh}
+    EOT
   }
+
+  # metadata = {
+  #   # ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+  #   ssh-keys = "ubuntu:${tls_private_key.vm_ssh.public_key_openssh}"
+  # }
 
   tags = ["cks-node"]
 }
