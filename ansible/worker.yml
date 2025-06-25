@@ -60,10 +60,10 @@
         - cks-worker
         - cks-master    
 
-    - name: Add public key to root authorized_keys
-      authorized_key:
-        user: root
-        key: "{{ public_key_openssh }}"    
+    # - name: Add public key to root authorized_keys
+    #   authorized_key:
+    #     user: root
+    #     key: "{{ public_key_openssh }}"    
     
     - name: Read join command from file
       set_fact:
