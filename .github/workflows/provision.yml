@@ -186,12 +186,7 @@ jobs:
         run: |
           ansible-playbook -i inventory.ini install_falco.yml
 
-
-    #   - name: 🛠️ Run Install Falco
-    #     if: env.TF_ACTION == 'apply'
-    #     working-directory: ansible
-    #     run: |
-    #       ansible-playbook -i inventory.ini install_falco.yml
+   
         
       
 
