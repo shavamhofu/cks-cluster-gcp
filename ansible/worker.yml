@@ -51,14 +51,14 @@
         group: root
         mode: '0600'
 
-    - name: Add target hosts to known_hosts
-      known_hosts:
-        path: /home/ubuntu/.ssh/known_hosts
-        name: "{{ item }}"
-        key: "{{ lookup('pipe', 'ssh-keyscan -H ' + item) }}"
-      loop:
-        - cks-worker
-        - cks-master    
+    # - name: Add target hosts to known_hosts
+    #   known_hosts:
+    #     path: /home/ubuntu/.ssh/known_hosts
+    #     name: "{{ item }}"
+    #     key: "{{ lookup('pipe', 'ssh-keyscan -H ' + item) }}"
+    #   loop:
+    #     - cks-worker
+    #     - cks-master    
 
     # - name: Add public key to root authorized_keys
     #   authorized_key:

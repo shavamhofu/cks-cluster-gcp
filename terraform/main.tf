@@ -92,6 +92,22 @@ resource "google_compute_instance" "cks-worker" {
       ubuntu:${tls_private_key.vm_ssh.public_key_openssh}
       root:${tls_private_key.vm_ssh.public_key_openssh}
     EOT
+
+    startup-script = <<-SCRIPT
+    #!/bin/bash
+    # Ensure root has authorized_keys
+    mkdir -p /root/.ssh
+    echo "${tls_private_key.vm_ssh.public_key_openssh}" >> /root/.ssh/authorized_keys
+    chmod 600 /root/.ssh/authorized_keys
+    chmod 700 /root/.ssh
+    # Pre-populate known_hosts
+    ssh-keyscan -H cks-worker >> /root/.ssh/known_hosts
+    worker_ip=$(getent hosts cks-worker | awk '{ print $1 }')
+    if [ -n "$worker_ip" ]; then
+      ssh-keyscan -H "$worker_ip" >> /root/.ssh/known_hosts
+    fi
+    chmod 600 /root/.ssh/known_hosts
+    SCRIPT
   }
 
   # metadata = {

@@ -9,7 +9,7 @@ on:
       action:
         description: 'Terraform action (apply/destroy)'
         required: true
-        default: 'apply'
+        default: 'destroy'
         type: choice
         options:
           - apply
@@ -22,7 +22,7 @@ jobs:
 
     env:
     #   TF_ACTION: apply
-      TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
+      TF_ACTION: ${{ github.event.inputs.action || 'destroy' }}
       GCP_PROJECT: nice-limiter-460717-s4
 
     steps:
@@ -75,31 +75,6 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y ansible openssh-client inetutils-ping netcat-openbsd jq
 
-     
-    #   - name: 🔑 Extract and Save Terraform SSH Private Key
-    #     id: extract_key
-    #     if: env.TF_ACTION == 'apply'
-    #     run: |
-    #         PRIVATE_KEY=$(terraform output -raw private_key_pem)
-    #         mkdir -p ~/.ssh
-    #         echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
-    #         chmod 600 ~/.ssh/id_rsa
-    #         echo "private_key_pem<<EOF" >> "$GITHUB_OUTPUT"
-    #         echo "$PRIVATE_KEY" >> "$GITHUB_OUTPUT"
-    #         echo "EOF" >> "$GITHUB_OUTPUT"
-    #     working-directory: terraform
-    #   - name: 🔑 Extract and Save Terraform SSH Private Key
-    #     id: extract_key
-    #     if: env.TF_ACTION == 'apply'
-    #     run: |
-    #         mkdir -p ~/.ssh
-    #         terraform output -raw private_key_pem > ~/.ssh/id_rsa
-    #         chmod 600 ~/.ssh/id_rsa
-
-    #         echo "private_key_pem<<EOF" >> "$GITHUB_OUTPUT"
-    #         cat ~/.ssh/id_rsa >> "$GITHUB_OUTPUT"
-    #         echo "EOF" >> "$GITHUB_OUTPUT"
-    #     working-directory: terraform   
       - name: 🔑 Extract and Save Terraform SSH Private Key
         id: extract_key
         if: env.TF_ACTION == 'apply'
@@ -142,22 +117,6 @@ jobs:
             fi
           done
 
-        #   for host in $HOSTS; do
-        #     echo "🔐 Scanning SSH key for $host..."
-        #     ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null
-        #   done
-# play books
-    #   - name: 🛠️ Run Ansible Playbooks Master
-    #     if: env.TF_ACTION == 'apply'
-    #     run: |
-    #       PRIVATE_KEY_PEM="${{ steps.extract_key.outputs.private_key_pem }}"
-    #       cd ansible 
-    #       ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${PRIVATE_KEY_PEM}" 2>&1 | sed 's/${PRIVATE_KEY_PEM}/[PRIVATE_KEY]/g'
-       #   ansible-playbook -i inventory.ini master.yml -vvvv --extra-vars "private_key_pem='${PRIVATE_KEY}'"
-        #   ansible-playbook -i inventory.ini master.yml  -vvvv
-        #   -e write_join_command=true 
-        #   ansible-playbook -i inventory.ini worker.yml -vvvv 
-
       - name: 🛠️ Run Ansible Playbooks Master
         if: env.TF_ACTION == 'apply'
         working-directory: ansible
@@ -166,11 +125,7 @@ jobs:
           echo '{"private_key_pem": ${{ toJson(steps.extract_key.outputs.private_key_pem) }}}' > temp_vars/ansible_vars.json
         
           ansible-playbook -i inventory.ini master.yml -vvvv --extra-vars "@temp_vars/ansible_vars.json"
-        # run: |
-        #     # ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
-        #     ansible-playbook -i inventory.ini master.yml --extra-vars "private_key_pem=${{ steps.extract_key.outputs.private_key_pem }}"
-
-
+        
       - name: 🛠️ Run Ansible Playbooks Worker
         if: env.TF_ACTION == 'apply'
         working-directory: ansible
