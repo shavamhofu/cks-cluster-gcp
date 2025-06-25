@@ -45,7 +45,7 @@
 
     - name: Copy private key to root
       copy:
-        content: "{{ private_key_pem }}"
+        content: "{{ private_key_pem_wk }}"
         dest: /root/.ssh/id_rsa
         owner: root
         group: root
